@@ -1,0 +1,4 @@
+-r requirements.txt
+
+ipython>=4.2.0
+mock==2.0.0
