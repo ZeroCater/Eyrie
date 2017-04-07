@@ -16,11 +16,9 @@ from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from github import UnknownObjectException, BadCredentialsException
 from social.apps.django_app.default.models import UserSocialAuth
-from social.apps.django_app.views import auth
 
-from interface.mixins import StaffRequiredMixin
-from interface.models import Build, Repo, Result, UserProxy
-from interface.utils import get_github, get_page_number_list
+from interface.models import Repo
+from interface.utils import get_github
 
 
 class BuildDetailView(generic.DetailView):
@@ -189,7 +187,7 @@ def ProcessRepo(request, full_name):
         repo = Repo.objects.create(
             full_name=grepo.full_name,
             user=user,
-            default_branch=grepo.default_branch,
+            wiki_branch=grepo.default_branch,
             is_private=grepo.private
         )
 
@@ -199,17 +197,9 @@ def ProcessRepo(request, full_name):
         except UnknownObjectException:
             raise Http404('Github failed to create a hook')
 
-    # Lint all open branches
+    # Enqueue wiki processing
     auth = request.user.get_auth()
-
-    for branch in grepo.get_branches():
-        build, created = Build.objects.get_or_create(
-            repo=repo,
-            ref=branch.name,
-            sha=branch.commit.sha
-        )
-        if created:
-            build.enqueue(auth)
+    repo.enqueue(auth)
 
     url = reverse('repo_detail', kwargs={'full_name': repo.full_name})
     return redirect(url)
