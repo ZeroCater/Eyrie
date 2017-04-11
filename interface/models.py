@@ -138,8 +138,6 @@ class Repo(models.Model):
 
         p = Path(self.directory)
 
-        acceptable_filetypes = ('md', 'txt')
-
         def parse_dir(dir):
             for x in dir.iterdir():
                 full_path = str(x)
@@ -152,7 +150,7 @@ class Repo(models.Model):
                     ext = ''
                     if '.' in filename:
                         _, ext = filename.rsplit('.', maxsplit=1)
-                    if ext in acceptable_filetypes:
+                    if ext in Document.FILE_TYPES:
                         with x.open() as f:
                             body = f.read()
                             # TODO: Add support for very large files (chunking?)
@@ -172,17 +170,25 @@ class Repo(models.Model):
         docs = []
 
         for document in documents:
-            path = document.path
-            if path == '':
+            doc_path = document.path
+            if path != '':
+                doc_path = doc_path.replace(path, '')
+            if doc_path == '':
                 docs.append(document.filename)
             else:
-                first_seg = path.split('/')[1]
+                first_seg = doc_path.split('/')[1]
                 if first_seg not in folders:
                     folders.append(first_seg)
 
         folders = sorted(folders)
         docs = sorted(docs)
         folders.extend(docs)
+
+        if path != '':
+            # Add parent folder link
+            parent_path = path.rsplit('/', maxsplit=1)[0]
+            parent = '/repo/{0}{1}'.format(self.full_name, parent_path)
+            folders.insert(0, parent)
 
         return folders
 
@@ -191,6 +197,8 @@ class Repo(models.Model):
 
 
 class Document(models.Model):
+    FILE_TYPES = ('md', 'txt')
+
     repo = models.ForeignKey(Repo, related_name='documents')
     path = models.TextField()
     filename = models.TextField()

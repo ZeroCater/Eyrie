@@ -40,7 +40,11 @@
                 {% for file in files %}
                     <tr class="build_row">
                         <td>
+                            {% if file|first == '/' %}
+                            <a href="{{ file }}">..</a>
+                            {% else %}
                             <a href="{{ request.path }}/{{ file }}">{{ file }}</a>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
