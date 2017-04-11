@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load staticfiles %}
+
+{% block title %}Linty - Error{% endblock %}
+
+{% block body %}
+    <div class="ui text menu">
+        <div class="ui item">
+            <div class="ui large breadcrumb">
+                {% include 'interface/breadcrumbs.html' with page_name='Error' %}
+            </div>
+        </div>
+        {% include 'interface/user_dropdown.html' with private=True %}
+    </div>
+    <div class="ui container center aligned">
+        <h1 class="ui header">Server Error</h1>
+        <p class="description">
+            An error occurred while processing your request.
+        </p>
+        <p class="description">
+            Please submit a bug report at <a href="https://github.com/ZeroCater/linty/issues">the code repository</a>.
+        </p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'repo_list' %}" class="ui big primary button">Go to Dashboard</a>
+        {% else %}
+            <a href="/" class="ui big primary button">Go to Home Page</a>
+        {% endif %}
+    </div>
+{% endblock %}

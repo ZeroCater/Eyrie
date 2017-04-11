@@ -144,18 +144,20 @@ class Repo(models.Model):
             for x in dir.iterdir():
                 full_path = str(x)
                 path, filename = full_path.rsplit('/', maxsplit=1)
-                if x.is_dir() and filename != '.git':
+                if filename == '.git':
+                    continue
+                elif x.is_dir():
                     parse_dir(x)
                 else:
                     ext = ''
                     if '.' in filename:
                         _, ext = filename.rsplit('.', maxsplit=1)
-                    with x.open() as f:
-                        body = f.read()
-                        # TODO: Add support for very large files (chunking?)
                     if ext in acceptable_filetypes:
+                        with x.open() as f:
+                            body = f.read()
+                            # TODO: Add support for very large files (chunking?)
                         path = path.replace(self.directory, '')
-                        Document(
+                        Document.objects.create(
                             repo=self,
                             path=path,
                             filename=filename,
@@ -164,12 +166,32 @@ class Repo(models.Model):
 
         parse_dir(p)
 
+    def get_files(self, path):
+        documents = Document.objects.filter(repo=self, path__startswith=path)
+        folders = []
+        docs = []
+
+        for document in documents:
+            path = document.path
+            if path == '':
+                docs.append(document.filename)
+            else:
+                first_seg = path.split('/')[1]
+                if first_seg not in folders:
+                    folders.append(first_seg)
+
+        folders = sorted(folders)
+        docs = sorted(docs)
+        folders.extend(docs)
+
+        return folders
+
     class Meta:
         ordering = ['full_name']
 
 
 class Document(models.Model):
-    repo = models.ForeignKey(Repo)
+    repo = models.ForeignKey(Repo, related_name='documents')
     path = models.TextField()
     filename = models.TextField()
     body = models.TextField(blank=True)

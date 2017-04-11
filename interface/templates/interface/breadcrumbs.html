@@ -1,0 +1,9 @@
+{% if user.is_authenticated %}
+    <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
+{% else %}
+    <a href="{% url 'index' %}">Home</a>
+{% endif %}
+<i class="right chevron icon divider"></i>
+{% if page_name %}
+<div class="active section">{{ page_name }}</div>
+{% endif %}

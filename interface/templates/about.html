@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load staticfiles %}
+
+{% block title %}Linty - About{% endblock %}
+
+{% block body %}
+    <div class="ui text menu">
+        <div class="ui item">
+            <div class="ui large breadcrumb">
+                {% include 'interface/breadcrumbs.html' with page_name='About' %}
+            </div>
+        </div>
+        {% include 'interface/user_dropdown.html' with private=True %}
+    </div>
+    <div class="ui container">
+        <h1 class="ui header center aligned">What is Linty?</h1>
+        <p class="description center aligned">
+            Linty is linting-as-a-service.
+        </p>
+        <p class="description">
+            Users sign in with their GitHub account, and select repositories they'd like Linty to review.
+            Linty then watches all commits to that repository and checks the code style to see if it adhere's to the project's own rules, or Linty's defaults.
+            Pull requests on watched repositories can receive <a href="https://help.github.com/articles/about-required-status-checks/">status checks</a> indicating the pass/fail status of the latest commit.
+            Repository owners can make Linty required, forcing all new code to adhere to a style code, resulting in a consistent style throughout the codebase.
+        </p>
+        <p class="description">
+            Linty is maintained by <a href="https://zerocater.com">ZeroCater</a> and was created to assist with keeping our own projects consistent and clean.
+            Because Linty is <a href="https://github.com/ZeroCater/linty">open source</a>, anyone with experience with Python/Django is welcome to contribute.
+            You can view the project's Trello board <a href="https://trello.com/b/w6mQAxUG/linty">here</a>.
+        </p>
+    </div>
+{% endblock %}
+
+{% block extra_head %}
+    <style>
+    h1.ui.header {
+        margin: 1.2em 0 !important;
+        font-size: 2.3em;
+    }
+    p.description {
+        font-size: 1.1em;
+        line-height: 1.8em;
+    }
+    h1[class*="center aligned"], p[class*="center aligned"] {
+        text-align: center;
+    }
+    </style>
+{% endblock %}

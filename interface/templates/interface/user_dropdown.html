@@ -1,0 +1,17 @@
+{% if user.is_authenticated %}
+    <div id="user_dropdown" class="ui right dropdown item">
+        {{ user.username }}
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <a href="{% url 'logout' %}{% if not private %}?next={{ request.path }}{% endif %}" class="item">Log Out</a>
+        </div>
+    </div>
+{% else %}
+    <div class="ui right item">
+    {% if DEBUG %}
+        <a href="{% url 'admin:login' %}" class="ui blue basic button">Log in</a>
+    {% else %}
+        <a href="{% url 'social:begin' 'github' %}?next={{ request.path }}" class="ui blue basic button">Log in</a>
+    {% endif %}
+    </div>
+{% endif %}

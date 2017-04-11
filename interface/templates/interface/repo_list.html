@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Eyrie - Repos{% endblock %}
+
+{% block body %}
+    <div class="ui text menu">
+        <div class="ui item">
+            <h1 class="ui header">Dashboard</h1>
+        </div>
+        {% include 'interface/user_dropdown.html' with private=True %}
+    </div>
+    <div class="ui warning tiny message">
+        <div class="header">
+            Site in beta
+        </div>
+        Eyrie is fairly new, and still under heavy development. Things are likely to break or change significantly. Please use with discretion.
+        You can follow development on <a href="https://github.com/ZeroCater/eyrie">GitHub</a>.
+    </div>
+    {% if welcome %}
+    <div class="ui success tiny message">
+        <div class="header">Welcome!</div>
+        Welcome to Eyrie! Below is a list of all the repositories you are a collaborator of. Click on one to add it!
+    </div>
+    {% endif %}
+    <h2 class="ui header">Browsable Repos</h2>
+    <div class="ui large middle aligned divided relaxed selection list">
+        {% for obj in object_list %}
+            <a class="item repo_link" href="{% url 'repo_detail' full_name=obj.full_name %}">
+                <div class="right floated content">
+                    <div class="ui basic button">Browse</div>
+                </div>
+                <div class="content">
+                    <span class="header repo_link">{{ obj.full_name }}</span>
+                    <span class="description build_count">{{ obj.doc_count }} Document{{ obj.doc_count|pluralize }}</span>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+
+    <h2 class="ui header">Available Repos</h2>
+    <div class="ui large divided relaxed selection list">
+        {% for obj in repos %}
+            <a class="item available_repo" href="{% url 'process_repo' full_name=obj.full_name %}">
+                <div class="right floated content">
+                    <div class="ui primary button">Add</div>
+                </div>
+                <div class="content">
+                    <span>{{ obj.full_name }}</span>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script type="text/javascript">
+        $('.available_repo, .repo_link').on('click', function (e) {
+            $(this).find('.button').addClass('loading');
+        });
+    </script>
+{% endblock %}

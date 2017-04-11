@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load staticfiles %}
+
+{% block title %}Linty - Error{% endblock %}
+
+{% block body %}
+    <div class="ui text menu">
+        <div class="ui item">
+            <div class="ui large breadcrumb">
+                {% include 'interface/breadcrumbs.html' with page_name='Page Not Found' %}
+            </div>
+        </div>
+        {% include 'interface/user_dropdown.html' with private=True %}
+    </div>
+    <div class="ui container center aligned">
+        <h1 class="ui header">Page Not Found</h1>
+        <p class="description">
+            The page you tried to reach does not exist.
+        </p>
+        <p class="description">
+            Perhaps try logging in <a href="{% url 'social:begin' 'github' %}">here</a>.
+        </p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'repo_list' %}" class="ui big primary button">Go to Dashboard</a>
+        {% else %}
+            <a href="/" class="ui big primary button">Go to Home Page</a>
+        {% endif %}
+    </div>
+{% endblock %}

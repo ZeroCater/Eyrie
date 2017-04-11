@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load staticfiles %}
+
+{% block title %}Linty - {{ object.short_sha }}{% endblock %}
+
+{% block extra_head %}
+    {% if object.status == 'pending' %}
+    <meta http-equiv="refresh" content="10" >
+    {% endif %}
+    <meta property="og:title" content="Linty - {{ repo.full_name }}:{{ object.short_sha }}">
+    <meta property="og:description" content="{{ object.meta_description }}">
+    <meta property="og:image" content="{{ object.meta_image }}">
+    <meta property="og:image:width" content="128">
+    <meta property="og:image:height" content="128">
+{% endblock %}
+
+{% block body %}
+    <div class="ui text menu">
+        <div class="ui item">
+            <div class="ui large breadcrumb">
+                {% include 'interface/breadcrumbs.html' %}
+                <a href="{% url 'repo_detail' full_name=repo.full_name %}" class="section">
+                    {{ repo.full_name }}
+                </a>
+                <i class="right chevron icon divider"></i>
+                <div class="active section">{{ object.ref }} : {{ object.short_sha }}</div>
+            </div>
+        </div>
+        {% include 'interface/user_dropdown.html' with private=repo.is_private %}
+    </div>
+
+    <div class="ui horizontal segments">
+        <div class="ui segment">
+            <div class="ui text {% if object.status == 'success' %}green{% elif object.status == 'pending' %}yellow{% else %}red{% endif %}">
+                <i class="large icon {% if object.status == 'success' %}check{% elif object.status == 'pending' %}wait{% else %}warning circle{% endif %}"></i>
+                {{ object.status }}
+            </div>
+        </div>
+        <div class="ui segment">
+            {% if not issues %}
+            <i class="large icon fork"></i>
+            <a href="https://github.com/{{ repo.full_name }}/tree/{{ object.ref }}">{{ object.ref }}</a>
+            {% else %}
+                {% for issue in issues %}
+                    <div>
+                        <i class="large icon fork"></i>
+                        <a href="{{ issue.html_url }}">#{{ issue.number }} {{ issue.title }}</a>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="ui segment">
+            <i class="large icon clock"></i>
+            {{ object.created_at|naturaltime }}
+        </div>
+        <a class="ui segment" href="{% url 'rebuild' pk=object.id %}">
+            <i class="large icon repeat"></i>
+            Re-Run
+        </a>
+    </div>
+
+    {% for result in results %}
+        {% with output=result.output %}
+            <div class="ui styled fluid accordion">
+                <div class="title {{ output|yesno:"active," }}">
+                    <i class="dropdown icon"></i>
+                    {{ result.get_linter_display }}
+                </div>
+                <div class="content {{ output|yesno:"active," }}">
+                    <div class="ui form transition {{ output|yesno:",hidden" }}">
+                        <div class="field">
+                            <textarea class="output" readonly style="max-height: 800px;">{{ output|default_if_none:"" }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endwith %}
+    {% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+    <script type="text/javascript">
+        $('.ui.accordion').accordion();
+        $("textarea").each(function () {
+            this.style.height = (this.scrollHeight)+'px';
+        });
+    </script>
+{% endblock %}

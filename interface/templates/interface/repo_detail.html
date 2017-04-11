@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load staticfiles %}
+{% load tz %}
+
+{% block title %}Eyrie - {{ object.full_name }}{% endblock %}
+
+{% block extra_head %}
+    <meta property="og:title" content="Eyrie - {{ object.full_name }}">
+    <meta property="og:description" content="Wiki browser for {{ object.full_name }} on GitHub.">
+{% endblock %}
+
+{% block body %}
+    <div class="ui text menu">
+        <div class="ui item">
+            <div class="ui large breadcrumb">
+                {% include 'interface/breadcrumbs.html' with page_name=object.full_name %}
+            </div>
+        </div>
+        {% include 'interface/user_dropdown.html' with private=object.is_private %}
+    </div>
+
+    <div class="ui text menu">
+        {% if is_owner %}
+        <div class="ui item">
+            <button id="settings" class="ui icon right aligned big basic button" data-inverted="" data-position="bottom right" data-tooltip="Settings">
+                <i class="icon setting"></i> Settings
+            </button>
+        </div>
+        {% endif %}
+    </div>
+    <table class="ui very basic selectable table">
+        <thead>
+        <tr>
+            <td>File Name</td>
+        </tr>
+        </thead>
+        <tbody>
+            {% if files %}
+                {% for file in files %}
+                    <tr class="build_row">
+                        <td>
+                            <a href="{{ request.path }}/{{ file }}">{{ file }}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td>This repository has no browsable contents.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    {% include 'interface/repo_pagination.html' %}
+
+    <div id="settings_modal" class="ui small modal">
+        <div class="header">
+            Repository Settings
+        </div>
+        <div class="content">
+            <form id="settings_form" action="" method="POST" class="ui form">
+                {% csrf_token %}
+                <div class="fields">
+                    <div class="eight wide field">
+                        <label for="default_branch">Wiki Branch</label>
+                        <select name="default_branch" id="default_branch" class=" ui search dropdown">
+                            {% for branch in branches %}
+                                <option value="{{ branch }}" {% if object.wiki_branch == branch %}selected=""{% endif %}>{{ branch }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <h4 class="ui horizontal divider header">
+                  Permissions
+                </h4>
+                <p>
+                    Eyrie respects the same permissions as GitHub. If this repo is public, then this repo is public in Eyrie.
+                    However, only collaborators may access these settings.
+                    If this repo is private, only collaborators of the repository can view this repo on Eyrie.<br/>
+                    Eyrie staff can see all pages, for support purposes.
+                </p>
+            </form>
+        </div>
+        <div class="actions">
+            <div class="ui left aligned red button" id="stop_linting">
+                Delete
+            </div>
+            <div class="ui gray cancel button">
+                <i class="remove icon"></i>
+                Cancel
+            </div>
+            <div id="save_button" class="ui green ok button">
+                <i class="checkmark icon"></i>
+                Save
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
+    <script type="text/javascript">
+     $.fn.api.settings.api = {
+        'stop_linting': '{% url "repo_delete" full_name=object.full_name %}'
+    };
+    </script>
+    <script type="text/javascript" src="{% static 'js/repo_detail.js' %}"></script>
+{% endblock %}
