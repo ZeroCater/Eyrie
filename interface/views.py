@@ -51,10 +51,17 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
             path = ''
 
         try:
+            # Viewing a single file
             trunc_path, filename = path.rsplit('/', maxsplit=1)
             context['document'] = Document.objects.get(repo=self.object, path=trunc_path, filename=filename)
             documents = []
         except:
+            try:
+                # Viewing a folder with a README
+                context['document'] = Document.objects.get(repo=self.object, path=path, filename__startswith='README')
+            except Document.DoesNotExist:
+                # Viewing a folder without a README
+                pass
             documents = Document.objects.filter(repo=self.object, path__startswith=path)
 
         context['files'] = self.object.get_folder_contents(path or '', documents)
