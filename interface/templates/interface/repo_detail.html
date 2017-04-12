@@ -9,6 +9,8 @@
 {% block extra_head %}
     <meta property="og:title" content="Eyrie - {{ object.full_name }}">
     <meta property="og:description" content="Wiki browser for {{ object.full_name }} on GitHub.">
+    <link rel="stylesheet" href="{% static 'css/markdown.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pygments.css' %}">
 {% endblock %}
 
 {% block body %}
@@ -58,7 +60,9 @@
         <hr>
         <span>/{{ document.path }}{{ document.filename }}</span>
         <hr>
-        {{ document.body|markdown }}
+        <article class="markdown-body">
+            {{ document.body|markdown }}
+        </article>
     {% endif %}
 
     {% include 'interface/repo_pagination.html' %}

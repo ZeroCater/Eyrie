@@ -25,4 +25,6 @@ def humanize_td(delta):
 @register.filter
 def markdown(text):
     extras = ['header-ids', 'fenced-code-blocks', 'target-blank-links', 'tables']
-    return mark_safe(markdown2.markdown(text, extras=extras))
+    rendered = markdown2.markdown(text, extras=extras)
+    rendered = rendered.replace('<pre><span></span><code>', '<pre>').replace('</code></pre>', '</pre>')
+    return mark_safe(rendered)
