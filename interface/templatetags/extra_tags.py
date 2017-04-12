@@ -24,7 +24,14 @@ def humanize_td(delta):
 
 @register.filter
 def markdown(text):
-    extras = ['header-ids', 'fenced-code-blocks', 'target-blank-links', 'tables']
+    extras = ['header-ids', 'fenced-code-blocks', 'tables', 'code-friendly', 'cuddled-lists']
     rendered = markdown2.markdown(text, extras=extras)
-    rendered = rendered.replace('<pre><span></span><code>', '<pre>').replace('</code></pre>', '</pre>')
+
+    # Remove <code> blocks nested in <pre>
+    rendered = rendered.replace('<pre><span></span><code>', '<pre>').replace('<pre><code>', '<pre>')
+    rendered = rendered.replace('</code></pre>', '</pre>')
+
+    # Hacky fix for [``]() escaping inner <code> block
+    rendered = rendered.replace('&lt;code&gt;', '<code>').replace('&lt;/code&gt;', '</code>')
+
     return mark_safe(rendered)

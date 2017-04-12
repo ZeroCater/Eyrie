@@ -1,20 +1,6 @@
 .codehilite {
     margin-bottom: 16px;
 }
-
-.codehilite pre {
-    padding: 16px;
-    overflow: auto;
-    font: 14px "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    line-height: 1.45;
-
-    background-color: #f6f8fa;
-    border-radius: 3px;
-
-    word-wrap: normal;
-    word-break: normal;
-}
-
 .codehilite .k { color: #a71d5d }
 .codehilite .nc, .nf { color: #795da3 }
 /*.codehilite .n { color: #ed6a43 }*/

@@ -66,6 +66,10 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
             documents = Document.objects.filter(repo=self.object, path__startswith=path)
 
         context['files'] = self.object.get_folder_contents(path or '', documents)
+
+        if len(context['files']) == 1 and 'document' not in context:
+            raise Http404
+
         return self.render_to_response(context)
 
     def form_invalid(self, form):
