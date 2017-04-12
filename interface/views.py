@@ -53,6 +53,7 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
         try:
             # Viewing a single file
             trunc_path, filename = path.rsplit('/', maxsplit=1)
+            trunc_path = '{}/'.format(trunc_path)
             context['document'] = Document.objects.get(repo=self.object, path=trunc_path, filename=filename)
             documents = []
         except:

@@ -140,7 +140,7 @@ class Repo(models.Model):
 
         def parse_dir(dir):
             for x in dir.iterdir():
-                full_path = str(x)
+                full_path = str(x).split('/', maxsplit=1)[1]
                 path, filename = full_path.rsplit('/', maxsplit=1)
                 if filename == '.git':
                     continue
@@ -154,7 +154,7 @@ class Repo(models.Model):
                         with x.open() as f:
                             body = f.read()
                             # TODO: Add support for very large files (chunking?)
-                        path = path.replace(self.directory, '')
+                        path = path.replace(self.directory, '') + '/'
                         Document.objects.create(
                             repo=self,
                             path=path,
@@ -175,9 +175,10 @@ class Repo(models.Model):
             if doc_path == '':
                 docs.append(document.filename)
             else:
-                first_seg = doc_path.split('/')[1]
-                if first_seg not in folders:
-                    folders.append(first_seg)
+                first_seg = doc_path.split('/', maxsplit=1)[0]
+                folder_name = '{}/'.format(first_seg)
+                if folder_name not in folders:
+                    folders.append(folder_name)
 
         folders = sorted(folders)
         docs = sorted(docs)
@@ -185,9 +186,14 @@ class Repo(models.Model):
 
         if path != '':
             # Add parent folder link
-            parent_path = path.rsplit('/', maxsplit=1)[0]
-            parent = '/repo/{0}{1}'.format(self.full_name, parent_path)
+            if path.endswith('/'):
+                parent = '..'
+            else:
+                parent_path = path.rsplit('/', maxsplit=1)[0]
+                parent = '/repo/{0}/{1}/'.format(self.full_name, parent_path)
+
             folders.insert(0, parent)
+
 
         return folders
 
@@ -204,4 +210,4 @@ class Document(models.Model):
     body = models.TextField(blank=True)
 
     def __str__(self):
-        return '{}/{}'.format(self.path, self.filename)
+        return '{}{}'.format(self.path, self.filename)

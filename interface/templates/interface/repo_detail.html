@@ -44,7 +44,7 @@
                             {% if file|first == '/' %}
                             <a class="build_link" href="{{ file }}">..</a>
                             {% else %}
-                            <a class="build_link" href="{{ request.path }}/{{ file }}">{{ file }}</a>
+                            <a class="build_link" href="{{ file }}">{{ file }}</a>
                             {% endif %}
                         </td>
                     </tr>
@@ -55,6 +55,9 @@
         </tbody>
     </table>
     {% if document %}
+        <hr>
+        <span>/{{ document.path }}{{ document.filename }}</span>
+        <hr>
         {{ document.body|markdown }}
     {% endif %}
 
