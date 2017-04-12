@@ -2,6 +2,7 @@
 {% load humanize %}
 {% load staticfiles %}
 {% load tz %}
+{% load extra_tags %}
 
 {% block title %}Eyrie - {{ object.full_name }}{% endblock %}
 
@@ -41,9 +42,9 @@
                     <tr class="build_row">
                         <td>
                             {% if file|first == '/' %}
-                            <a href="{{ file }}">..</a>
+                            <a class="build_link" href="{{ file }}">..</a>
                             {% else %}
-                            <a href="{{ request.path }}/{{ file }}">{{ file }}</a>
+                            <a class="build_link" href="{{ request.path }}/{{ file }}">{{ file }}</a>
                             {% endif %}
                         </td>
                     </tr>
@@ -53,6 +54,9 @@
             {% endif %}
         </tbody>
     </table>
+    {% if document %}
+        {{ document.body|markdown }}
+    {% endif %}
 
     {% include 'interface/repo_pagination.html' %}
 
@@ -85,7 +89,7 @@
             </form>
         </div>
         <div class="actions">
-            <div class="ui left aligned red button" id="stop_linting">
+            <div class="ui left aligned red button" id="delete_repo">
                 Delete
             </div>
             <div class="ui gray cancel button">
@@ -104,7 +108,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
     <script type="text/javascript">
      $.fn.api.settings.api = {
-        'stop_linting': '{% url "repo_delete" full_name=object.full_name %}'
+        'delete_repo': '{% url "repo_delete" full_name=object.full_name %}'
     };
     </script>
     <script type="text/javascript" src="{% static 'js/repo_detail.js' %}"></script>

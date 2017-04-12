@@ -164,8 +164,7 @@ class Repo(models.Model):
 
         parse_dir(p)
 
-    def get_files(self, path):
-        documents = Document.objects.filter(repo=self, path__startswith=path)
+    def get_folder_contents(self, path, documents):
         folders = []
         docs = []
 

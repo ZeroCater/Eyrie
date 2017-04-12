@@ -1,0 +1,41 @@
+.ui.text.red {
+    color: #db2828!important;
+}
+.ui.text.yellow {
+    color: #fbbd08!important;
+}
+.ui.text.green {
+    color: #21ba45!important;
+}
+.repo_link {
+    color: #2185d0!important;
+}
+.available_repo {
+    color: rgba(0,0,0,.4)!important;
+}
+.build_count {
+    font-size: 0.7em;
+}
+.paginator_bottom {
+    margin-bottom: 0.8em!important;
+}
+.ui.grid > .build_label {
+    margin-top: 0.5em;
+    padding-left: 0;
+}
+body > .ui.text.container {
+    max-width: 800px !important;
+}
+textarea.output {
+    font-family: monospace;
+    font-size: 12px !important;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: scroll;
+}
+.left.aligned.button {
+    float: left;
+}
+.build_row {
+    cursor: pointer;
+}

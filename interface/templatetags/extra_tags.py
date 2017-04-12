@@ -1,3 +1,4 @@
+import markdown2
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -19,3 +20,9 @@ def humanize_td(delta):
         if not dhms[end].startswith('0'):
             break
     return mark_safe(', '.join(dhms[start:end+1]))
+
+
+@register.filter
+def markdown(text):
+    extras = ['header-ids', 'fenced-code-blocks', 'target-blank-links', 'tables']
+    return mark_safe(markdown2.markdown(text, extras=extras))

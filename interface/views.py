@@ -16,7 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from github import UnknownObjectException, BadCredentialsException
 from social.apps.django_app.default.models import UserSocialAuth
 
-from interface.models import Repo
+from interface.models import Repo, Document
 from interface.utils import get_github
 
 
@@ -43,9 +43,21 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
             grepo = g.get_repo(self.object.full_name)
             context['branches'] = [i.name for i in grepo.get_branches()]
 
-        path = kwargs.get('path')
-        context['files'] = self.object.get_files(path or '')
 
+        # Get folder contents or Document
+        path = kwargs.get('path')
+
+        if path is None:
+            path = ''
+
+        try:
+            trunc_path, filename = path.rsplit('/', maxsplit=1)
+            context['document'] = Document.objects.get(repo=self.object, path=trunc_path, filename=filename)
+            documents = []
+        except:
+            documents = Document.objects.filter(repo=self.object, path__startswith=path)
+
+        context['files'] = self.object.get_folder_contents(path or '', documents)
         return self.render_to_response(context)
 
     def form_invalid(self, form):
