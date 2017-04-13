@@ -178,9 +178,9 @@ class Repo(models.Model):
             doc_path = document.path
             if path != '/':
                 doc_path = doc_path.replace(path, '')
-                if not doc_path.startswith('/') and doc_path != '':
+                if not doc_path.startswith('/'):
                     doc_path = '/{}'.format(doc_path)
-            if doc_path == '':
+            if doc_path == '/':
                 docs.append(document.filename)
             else:
                 first_seg = doc_path.split('/', maxsplit=2)[1]
