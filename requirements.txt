@@ -9,3 +9,4 @@ pygithub==1.26.0
 django-rq==0.9.2
 raven==5.32.0
 markdown2==2.3.3
+python-dateutil==2.6.0

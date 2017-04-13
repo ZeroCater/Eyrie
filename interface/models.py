@@ -3,6 +3,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import dateutil.parser
 import django_rq
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -154,12 +155,22 @@ class Repo(models.Model):
                         with x.open() as f:
                             body = f.read()
                             # TODO: Add support for very large files (chunking?)
-                        path = path.replace(self.directory, '') + '/'
+
+                        file_path = '{0}/tmp/{1}'.format(os.getcwd(), full_path)
+
+                        git_commit_date = subprocess.check_output([
+                            'git', '--git-dir=%s/.git' % self.directory, '--work-tree=%s' % self.directory,
+                            'log', '-1', '--format=%cd', file_path
+                        ])
+                        commit_date = dateutil.parser.parse(git_commit_date)
+
+                        path = path.replace(self.directory.replace('tmp/', ''), '') + '/'
                         Document.objects.create(
                             repo=self,
                             path=path,
                             filename=filename,
-                            body=body
+                            body=body,
+                            commit_date=commit_date
                         )
 
         parse_dir(p)
@@ -170,28 +181,25 @@ class Repo(models.Model):
 
         for document in documents:
             doc_path = document.path
-            if path != '':
+            if path != '/':
                 doc_path = doc_path.replace(path, '')
-            if doc_path == '':
+                if not doc_path.startswith('/'):
+                    doc_path = '/{}'.format(doc_path)
+            if doc_path == '/':
                 docs.append(document.filename)
             else:
-                first_seg = doc_path.split('/', maxsplit=1)[0]
-                folder_name = '{}/'.format(first_seg)
-                if folder_name not in folders:
-                    folders.append(folder_name)
+                first_seg = doc_path.split('/', maxsplit=2)[1]
+                if first_seg:
+                    folder_name = '{}/'.format(first_seg)
+                    if folder_name not in folders:
+                        folders.append(folder_name)
 
         folders = sorted(folders)
         docs = sorted(docs)
         folders.extend(docs)
 
-        if path != '':
-            # Add parent folder link
-            if path.endswith('/'):
-                parent = '..'
-            else:
-                parent_path = path.rsplit('/', maxsplit=1)[0]
-                parent = '/repo/{0}/{1}/'.format(self.full_name, parent_path)
-
+        if path != '/' and path.endswith('/'):
+            parent = '..'
             folders.insert(0, parent)
 
 
@@ -208,6 +216,7 @@ class Document(models.Model):
     path = models.TextField()
     filename = models.TextField()
     body = models.TextField(blank=True)
+    commit_date = models.DateTimeField()
 
     def __str__(self):
         return '{}{}'.format(self.path, self.filename)

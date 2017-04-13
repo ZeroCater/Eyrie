@@ -39,26 +39,25 @@
         </tr>
         </thead>
         <tbody>
-            {% if files %}
-                {% for file in files %}
-                    <tr class="build_row">
-                        <td>
-                            {% if file|first == '/' %}
-                            <a class="build_link" href="{{ file }}">..</a>
-                            {% else %}
-                            <a class="build_link" href="{{ file }}">{{ file }}</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            {% else %}
-                <tr><td>This repository has no browsable contents.</td></tr>
+            {% if document and not files %}
+            <tr class="build_row">
+                <td>
+                    <a class="build_link" href=".">.</a>
+                </td>
+            </tr>
             {% endif %}
+            {% for file in files %}
+                <tr class="build_row">
+                    <td>
+                        <a class="build_link" href="{{ file }}">{{ file }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
     {% if document %}
         <hr>
-        <span>/{{ document.path }}{{ document.filename }}</span>
+        <span>{{ document.path }}{{ document.filename }}</span>
         <hr>
         <article class="markdown-body">
             {{ document.body|markdown }}
