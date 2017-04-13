@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'social.apps.django_app.default',
     'django.contrib.humanize',
     'interface',
+    'webhooks',
     'django_rq'
 ]
 

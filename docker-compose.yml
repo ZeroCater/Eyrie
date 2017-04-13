@@ -10,3 +10,11 @@ services:
     env_file: .env
     ports:
       - "3001:3001"
+  worker:
+    build: .
+    command: python manage.py rqworker default
+    volumes:
+      - .:/code
+    env_file: .env
+  redis:
+    image: redis
