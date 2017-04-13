@@ -1,9 +1,9 @@
-import datetime
 import os
 import shutil
 import subprocess
 from pathlib import Path
 
+import dateutil.parser
 import django_rq
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -157,15 +157,20 @@ class Repo(models.Model):
                             # TODO: Add support for very large files (chunking?)
 
                         file_path = '{0}/tmp/{1}'.format(os.getcwd(), full_path)
-                        timestamp = os.path.getmtime(file_path)
-                        modified_at = datetime.datetime.utcfromtimestamp(timestamp)
+
+                        git_commit_date = subprocess.check_output([
+                            'git', '--git-dir=%s/.git' % self.directory, '--work-tree=%s' % self.directory,
+                            'log', '-1', '--format=%cd', file_path
+                        ])
+                        commit_date = dateutil.parser.parse(git_commit_date)
+
                         path = path.replace(self.directory.replace('tmp/', ''), '') + '/'
                         Document.objects.create(
                             repo=self,
                             path=path,
                             filename=filename,
                             body=body,
-                            modified_at=modified_at
+                            modified_at=commit_date
                         )
 
         parse_dir(p)
