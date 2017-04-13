@@ -44,13 +44,24 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
             context['branches'] = [i.name for i in grepo.get_branches()]
 
 
-        # Get folder contents or Document
         path = kwargs.get('path')
 
         if path is None:
             path = '/'
         else:
+            breadcrumbs = path.split('/')
+            context['base_url'] = self.object.get_absolute_url()
+            b_tuples = []
+            for b in breadcrumbs:
+                if not b_tuples:
+                    url = '{0}{1}/'.format(context['base_url'], b)
+                else:
+                    url = '{0}{1}/'.format(b_tuples[-1][0], b)
+                b_tuples.append((url, b))
+            context['breadcrumbs'] = b_tuples
             path = '/{}'.format(path)
+
+        context['path'] = path
 
         try:
             # Viewing a single file
@@ -69,7 +80,7 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
 
         context['files'] = self.object.get_folder_contents(path, documents)
 
-        if len(context['files']) == 1 and 'document' not in context:
+        if len(context['files']) == 0 and 'document' not in context:
             raise Http404
 
         return self.render_to_response(context)

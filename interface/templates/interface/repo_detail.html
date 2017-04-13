@@ -32,13 +32,30 @@
         </div>
         {% endif %}
     </div>
+    {% if breadcrumbs %}
+    <div class="breadcrumb">
+        <span class="repo-root">
+            <a href="{{ base_url }}">{{ object.full_name }}</a>
+        </span>
+        {% for b_url, b_text in breadcrumbs %}
+        <span class="separator">/</span>
+        <span>
+            {% if not forloop.last %}
+            <a href="{{ b_url }}">{{ b_text }}</a>
+            {% else %}
+                <strong>{{ b_text }}</strong>
+            {% endif %}
+        </span>
+        {% endfor %}
+    </div>
+    {% endif %}
     <table class="files">
         <tbody>
-            {% if document and not files %}
+            {% if path != '/' and not document %}
             <tr class="up-tree">
                 <td class="icon"></td>
                 <td class="content">
-                    <a href="." rel="nofollow" title="Go to parent directory">.</a>
+                    <a href=".." rel="nofollow" title="Go to parent directory">..</a>
                 </td>
                 <td class="age"></td>
             </tr>

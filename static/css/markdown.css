@@ -142,6 +142,32 @@
 .markdown-body h1:hover .anchor .octicon-link, .markdown-body h2:hover .anchor .octicon-link, .markdown-body h3:hover .anchor .octicon-link, .markdown-body h4:hover .anchor .octicon-link, .markdown-body h5:hover .anchor .octicon-link, .markdown-body h6:hover .anchor .octicon-link {
     visibility: visible;
 }
+
+.breadcrumb {
+    margin-bottom: 10px;
+    color: #586069;
+    float: left;
+    margin-top: 0;
+    margin-left: 5px;
+    font-size: 16px;
+    line-height: 26px;
+}
+.breadcrumb .repo-root {
+    font-weight: 600;
+}
+.breadcrumb .separator::before, .breadcrumb .separator::after {
+    content: " ";
+}
+.breadcrumb a {
+    color: #0366d6;
+}
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+.breadcrumb strong.final-path {
+    color: #24292e;
+}
+
 .readme > h3 {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
         sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";

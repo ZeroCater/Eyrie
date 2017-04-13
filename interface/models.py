@@ -198,11 +198,6 @@ class Repo(models.Model):
         docs = sorted(docs)
         folders.extend(docs)
 
-        if path != '/' and path.endswith('/'):
-            parent = '..'
-            folders.insert(0, parent)
-
-
         return folders
 
     class Meta:
