@@ -170,7 +170,7 @@ class Repo(models.Model):
                             path=path,
                             filename=filename,
                             body=body,
-                            modified_at=commit_date
+                            commit_date=commit_date
                         )
 
         parse_dir(p)
@@ -216,7 +216,7 @@ class Document(models.Model):
     path = models.TextField()
     filename = models.TextField()
     body = models.TextField(blank=True)
-    modified_at = models.DateTimeField()
+    commit_date = models.DateTimeField()
 
     def __str__(self):
         return '{}{}'.format(self.path, self.filename)
