@@ -1,52 +1,36 @@
-import hashlib
-import hmac
-import json
-
-from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from interface.models import Repo
 
+from webhooks.models import GitHook, GitHookError, GitHookAccessError
+
 
 @csrf_exempt
-def WebhookView(request):
-    if 'HTTP_X_HUB_SIGNATURE' not in request.META:
-        return HttpResponse(status=403)
-
-    sig = request.META['HTTP_X_HUB_SIGNATURE']
-    text = request.body
-
-    secret = str.encode(settings.WEBHOOK_SECRET)
-    signature = 'sha1=' + hmac.new(secret, msg=text, digestmod=hashlib.sha1).hexdigest()
-
-    if not hmac.compare_digest(sig, signature):
-        return HttpResponse(status=403)
+def github_webhook(request):
+    git_hook = GitHook(request)
 
     try:
-        body = json.loads(text.decode('utf-8'))
-        assert body
-    except ValueError:
-        return HttpResponse('Invalid JSON body.', status=400)
+        git_hook.process_request()
+    except GitHookAccessError:
+        return HttpResponse(status=403)
+    except GitHookError as e:
+        return HttpResponse(str(e), status=400)
 
-    try:
-        repo = Repo.objects.get(full_name=body['repository']['full_name'])
-    except Repo.DoesNotExist:
-        return 'Repo not registered'
+    repo = Repo.objects.filter(full_name=git_hook.repository['full_name']).first()
 
-    if 'ref' not in body or not body['head_commit'] or \
-            body['ref'].rsplit('/', maxsplit=1)[1] != repo.wiki_branch:  # Ignore non-wiki branches
+    if not repo:
+        return HttpResponse(status=204)
+
+    # Ignore non-wiki branches
+    if git_hook.branch_name != repo.wiki_branch:
         return HttpResponse(status=204)
 
     # Update repo privacy, if changed
-    if repo.is_private != body['repository']['private']:
-        repo.is_private = body['repository']['private']
+    if repo.is_private != git_hook.repository['private']:
+        repo.is_private = git_hook.repository['private']
         repo.save()
 
-    auth = repo.user.get_auth()
-    if not auth:
-        return 'User for repo not logged in'
-
-    repo.enqueue(auth)
+    repo.enqueue()
 
     return HttpResponse(status=202)

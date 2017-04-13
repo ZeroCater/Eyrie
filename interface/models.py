@@ -17,6 +17,7 @@ from interface.utils import get_github
 
 
 class UserProxy(User):
+
     class Meta:
         proxy = True
 
@@ -91,7 +92,7 @@ class Repo(models.Model):
                 'web',
                 {
                     'content_type': 'json',
-                    'url': request.build_absolute_uri(reverse('webhook')),
+                    'url': request.build_absolute_uri(reverse('hooksgithub')),
                     'secret': settings.WEBHOOK_SECRET
                 },
                 events=['push'],
@@ -128,7 +129,6 @@ class Repo(models.Model):
         subprocess.call([
             'git', '--git-dir=%s/.git' % directory, '--work-tree=%s' % directory, 'checkout', self.wiki_branch
         ])
-
 
     def enqueue(self):
         django_rq.enqueue(process_wiki, self.id)
