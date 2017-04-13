@@ -43,7 +43,6 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
             grepo = g.get_repo(self.object.full_name)
             context['branches'] = [i.name for i in grepo.get_branches()]
 
-
         path = kwargs.get('path')
 
         if path is None:
@@ -186,49 +185,6 @@ def ProcessRepo(request, full_name):
 
     url = reverse('repo_detail', kwargs={'full_name': repo.full_name})
     return redirect(url)
-
-
-@csrf_exempt
-def WebhookView(request):
-    if 'HTTP_X_HUB_SIGNATURE' not in request.META:
-        return HttpResponse(status=403)
-
-    sig = request.META['HTTP_X_HUB_SIGNATURE']
-    text = request.body
-
-    secret = str.encode(settings.WEBHOOK_SECRET)
-    signature = 'sha1=' + hmac.new(secret, msg=text, digestmod=hashlib.sha1).hexdigest()
-
-    if not hmac.compare_digest(sig, signature):
-        return HttpResponse(status=403)
-
-    try:
-        body = json.loads(text.decode('utf-8'))
-        assert body
-    except ValueError:
-        return HttpResponse('Invalid JSON body.', status=400)
-
-    try:
-        repo = Repo.objects.get(full_name=body['repository']['full_name'])
-    except Repo.DoesNotExist:
-        return 'Repo not registered'
-
-    if 'ref' not in body or not body['head_commit'] or \
-        body['ref'].rsplit('/', maxsplit=1)[1] != repo.wiki_branch: # Ignore non-wiki branches
-        return HttpResponse(status=204)
-
-    # Update repo privacy, if changed
-    if repo.is_private != body['repository']['private']:
-        repo.is_private = body['repository']['private']
-        repo.save()
-
-    auth = repo.user.get_auth()
-    if not auth:
-        return 'User for repo not logged in'
-
-    repo.enqueue(auth)
-
-    return HttpResponse(status=202)
 
 
 def LogoutView(request):
