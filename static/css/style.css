@@ -13,7 +13,7 @@
 .available_repo {
     color: rgba(0,0,0,.4)!important;
 }
-.build_count {
+.doc_count {
     font-size: 0.7em;
 }
 .paginator_bottom {
@@ -26,16 +26,6 @@
 body > .ui.text.container {
     max-width: 980px !important;
 }
-textarea.output {
-    font-family: monospace;
-    font-size: 12px !important;
-    white-space: pre;
-    overflow-wrap: normal;
-    overflow-x: scroll;
-}
 .left.aligned.button {
     float: left;
-}
-.build_row {
-    cursor: pointer;
 }
