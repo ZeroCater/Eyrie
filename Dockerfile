@@ -1,4 +1,4 @@
-FROM python:2.7
+FROM python:3.5.2
 ENV PYTHONUNBUFFERED 1
 RUN mkdir /code
 RUN adduser --disabled-password --gecos "" worker

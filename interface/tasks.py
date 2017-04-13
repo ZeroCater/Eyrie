@@ -16,4 +16,5 @@ def process_wiki(repo_id):
         return 'Processing finished'
     except Exception as e:
         print(e)
+        raise
         return 'Build Failed'
