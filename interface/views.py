@@ -48,7 +48,9 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
         path = kwargs.get('path')
 
         if path is None:
-            path = ''
+            path = '/'
+        else:
+            path = '/{}'.format(path)
 
         try:
             # Viewing a single file
@@ -65,7 +67,7 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
                 pass
             documents = Document.objects.filter(repo=self.object, path__startswith=path)
 
-        context['files'] = self.object.get_folder_contents(path or '', documents)
+        context['files'] = self.object.get_folder_contents(path, documents)
 
         if len(context['files']) == 1 and 'document' not in context:
             raise Http404
