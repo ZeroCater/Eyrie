@@ -62,3 +62,15 @@ class GithubHook(object):
             self.body = json.loads(self.request.body.decode('utf-8'))
         except ValueError:
             raise GithubHookError("Invalid body format")
+
+    @property
+    def file_change_data(self):
+        modified = []
+        removed = []
+        for commit in self.commits:
+            modified += commit.get('modified', []) + commit.get('added', [])
+            removed += commit.get('removed', [])
+
+        removed = ["/{}".format(path) for path in removed]
+        modified = ["/{}".format(path) for path in modified]
+        return {'removed': removed, 'modified': modified}

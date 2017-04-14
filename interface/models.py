@@ -102,8 +102,9 @@ class Repo(models.Model):
     def directory(self):
         return 'tmp/{}'.format(self.full_name)
 
-    def enqueue(self):
-        process_wiki.delay(self.id)
+    def enqueue(self, file_change=None):
+        file_change = file_change or {}
+        process_wiki.delay(self.id, file_change)
 
     def get_folder_contents(self, path, documents):
         folders = []

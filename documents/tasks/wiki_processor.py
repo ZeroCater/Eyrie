@@ -10,7 +10,9 @@ import dateutil.parser
 
 
 @job
-def process_wiki(repo_id):
+def process_wiki(repo_id, file_change=None):
+    file_change = file_change or {}
+
     Repo = apps.get_model('interface.Repo')
     try:
         repo = Repo.objects.get(id=repo_id)
@@ -20,8 +22,9 @@ def process_wiki(repo_id):
     auth = repo.user.get_auth()
 
     try:
+        delete_removed_files(repo_id, file_change)
         clone(repo.clone_url, repo.wiki_branch, repo.directory, auth)
-        parse_fs(repo)
+        parse_fs(repo, file_change)
         clean_directory(repo.directory)
     except Exception as e:
         print(e)
@@ -29,23 +32,27 @@ def process_wiki(repo_id):
         return 'Build Failed'
 
 
-def parse_fs(repo):
+def parse_fs(repo, file_change):
     # Walk through each file in the filesystem
     # Create/Delete/Update Documents
     path = Path(repo.directory)
-    parse_dir(path, repo.id, repo.directory)
+    parse_dir(path, repo.id, repo.directory, file_change)
 
 
-def parse_dir(dir, repo_id, repo_directory):
+def parse_dir(dir, repo_id, repo_directory, file_change):
     for sub_path in dir.iterdir():
+
         full_path = str(sub_path).split('/', maxsplit=1)[1]
         path, filename = full_path.rsplit('/', maxsplit=1)
+
+        file_path = full_path.replace(repo_directory.replace('tmp/', ''), '')
+
         if filename == '.git':
             continue
-
         if sub_path.is_dir():
-            parse_dir(sub_path, repo_id, repo_directory)
-        else:
+            parse_dir(sub_path, repo_id, repo_directory, file_change)
+        elif not file_change.get('modified', None) or file_path in file_change['modified']:
+            path = path.replace(repo_directory.replace('tmp/', ''), '') + '/'
             process_file_as_document(sub_path, full_path, repo_id, repo_directory)
 
 
@@ -82,6 +89,17 @@ def process_file_as_document(file_directory, file_path, repo_id, repo_directory)
     document.commit_date = commit_date
     document.full_clean()
     document.save()
+
+
+def delete_removed_files(repo_id, file_change):
+    if not file_change.get('removed', None):
+        return
+
+    Document = apps.get_model('documents.Document')
+
+    for file_path in file_change['removed']:
+        path, filename = file_path.rsplit('/', maxsplit=1)
+        Document.objects.filter(repo_id=repo_id, path="{}/".format(path), filename=filename).delete()
 
 
 def clone(clone_url, branch, repo_directory, auth):

@@ -8,10 +8,10 @@ from webhooks.models import GithubHook, GithubHookError, GithubHookAccessError, 
 
 @csrf_exempt
 def github_webhook(request):
-    git_hook = GithubHook(request)
+    github_hook = GithubHook(request)
 
     try:
-        git_hook.process_request()
+        github_hook.process_request()
     except GithubHookAccessError:
         return HttpResponse(status=403)
     except GithubHookContentError:
@@ -19,20 +19,21 @@ def github_webhook(request):
     except GithubHookError as e:
         return HttpResponse(str(e), status=400)
 
-    repo = Repo.objects.filter(full_name=git_hook.repository['full_name']).first()
+    repo = Repo.objects.filter(full_name=github_hook.repository['full_name']).first()
 
     if not repo:
         return HttpResponse(status=204)
 
     # Ignore non-wiki branches
-    if git_hook.branch_name != repo.wiki_branch:
+    if github_hook.branch_name != repo.wiki_branch:
         return HttpResponse(status=204)
 
     # Update repo privacy, if changed
-    if repo.is_private != git_hook.repository['private']:
-        repo.is_private = git_hook.repository['private']
+    if repo.is_private != github_hook.repository['private']:
+        repo.is_private = github_hook.repository['private']
         repo.save()
 
-    repo.enqueue()
+    file_change_data = github_hook.file_change_data
+    repo.enqueue(file_change_data)
 
     return HttpResponse(status=202)
