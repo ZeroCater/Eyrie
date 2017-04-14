@@ -50,7 +50,7 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
             path = '/'
         else:
             breadcrumbs = path.split('/')
-            context['base_url'] = self.object.get_absolute_url()
+            context['base_url'] = request.build_absolute_uri(self.object.get_absolute_url())
             b_tuples = []
             for b in breadcrumbs:
                 if not b_tuples:

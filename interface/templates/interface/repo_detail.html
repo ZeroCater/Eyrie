@@ -144,6 +144,9 @@
      $.fn.api.settings.api = {
         'delete_repo': '{% url "repo_delete" full_name=object.full_name %}'
     };
+     var full_name = '{{ object.full_name }}';
+     var branch = '{{ object.wiki_branch }}';
+     var base_url = '{{ base_url }}';
     </script>
     <script type="text/javascript" src="{% static 'js/repo_detail.js' %}"></script>
 {% endblock %}
