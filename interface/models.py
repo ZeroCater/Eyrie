@@ -43,6 +43,9 @@ class Repo(models.Model):
     disabled = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['full_name']
+
     def __str__(self):
         return self.full_name
 
@@ -165,13 +168,15 @@ class Repo(models.Model):
                         commit_date = dateutil.parser.parse(git_commit_date)
 
                         path = path.replace(self.directory.replace('tmp/', ''), '') + '/'
-                        Document.objects.create(
+                        document = Document.objects.get_or_create(
                             repo=self,
                             path=path,
                             filename=filename,
-                            body=body,
-                            commit_date=commit_date
                         )
+                        document.body = body
+                        document.commit_date = commit_date
+                        document.full_clean()
+                        document.save()
 
         parse_dir(p)
 
@@ -200,9 +205,6 @@ class Repo(models.Model):
 
         return folders
 
-    class Meta:
-        ordering = ['full_name']
-
 
 class Document(models.Model):
     FILE_TYPES = ('md', 'txt')
@@ -215,3 +217,6 @@ class Document(models.Model):
 
     def __str__(self):
         return '{}{}'.format(self.path, self.filename)
+
+    class Meta:
+        unique_together = ('repo', 'path', 'filename')
