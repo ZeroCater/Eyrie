@@ -3,18 +3,20 @@ from django.views.decorators.csrf import csrf_exempt
 
 from interface.models import Repo
 
-from webhooks.models import GitHook, GitHookError, GitHookAccessError
+from webhooks.models import GithubHook, GithubHookError, GithubHookAccessError, GithubHookContentError
 
 
 @csrf_exempt
 def github_webhook(request):
-    git_hook = GitHook(request)
+    git_hook = GithubHook(request)
 
     try:
         git_hook.process_request()
-    except GitHookAccessError:
+    except GithubHookAccessError:
         return HttpResponse(status=403)
-    except GitHookError as e:
+    except GithubHookContentError:
+        return HttpResponse(status=204)
+    except GithubHookError as e:
         return HttpResponse(str(e), status=400)
 
     repo = Repo.objects.filter(full_name=git_hook.repository['full_name']).first()

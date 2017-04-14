@@ -5,18 +5,22 @@ import json
 from django.conf import settings
 
 
-class GitHookError(Exception):
+class GithubHookError(Exception):
     pass
 
 
-class GitHookAccessError(GitHookError):
+class GithubHookAccessError(GithubHookError):
+    pass
+
+
+class GithubHookContentError(GithubHookError):
     pass
 
 
 REQUIRED_KEYS = ['ref', 'before', 'commits']
 
 
-class GitHook(object):
+class GithubHook(object):
 
     def __init__(self, request):
         self.request = request
@@ -34,7 +38,7 @@ class GitHook(object):
 
     def validate_header(self):
         if 'HTTP_X_HUB_SIGNATURE' not in self.request.META:
-            raise GitHookAccessError('Wrong signature')
+            raise GithubHookAccessError('Wrong signature')
 
         sig = self.request.META['HTTP_X_HUB_SIGNATURE']
         text = self.request.body
@@ -43,11 +47,11 @@ class GitHook(object):
         signature = 'sha1=' + hmac.new(secret, msg=text, digestmod=hashlib.sha1).hexdigest()
 
         if not hmac.compare_digest(sig, signature):
-            raise GitHookAccessError('Signature does not match')
+            raise GithubHookAccessError('Signature does not match')
 
     def validate_keys(self):
         if not all(key in self.body for key in REQUIRED_KEYS):
-            raise GitHookError("Incomplete data")
+            raise GithubHookContentError("Incomplete data")
 
     def generate_properties(self):
         for key, value in self.body.items():
@@ -57,4 +61,4 @@ class GitHook(object):
         try:
             self.body = json.loads(self.request.body.decode('utf-8'))
         except ValueError:
-            raise GitHookError("Invalid body format")
+            raise GithubHookError("Invalid body format")
