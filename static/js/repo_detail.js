@@ -39,4 +39,12 @@ $('.markdown-body img').each(function(idx, value) {
   var image_path = 'https://github.com/'+full_name+'/blob/'+branch+'/';
   // value.src is always a full path, even if the actual src is a relative path, so this should always work
   value.src = value.src.replace(base_url, image_path) + '?raw=true';
+  // TODO: Wrap the <img> with a <a>
+});
+$('.markdown-body a:not(.anchor)').each(function(idx, value) {
+  var image_path = 'https://github.com/'+full_name+'/blob/'+branch+'/';
+  if (value.href.endsWith('.png') || value.href.endsWith('.jpg') || value.href.endsWith('.jpeg')) {
+    value.href = value.href.replace(base_url, image_path);
+    value.target = '_blank';
+  }
 });
