@@ -212,7 +212,7 @@ class Document(models.Model):
     repo = models.ForeignKey(Repo, related_name='documents')
     path = models.TextField()
     filename = models.TextField()
-    body = models.TextField(blank=True)
+    body = models.TextField(blank=True, db_index=True)
     commit_date = models.DateTimeField()
 
     def __str__(self):
