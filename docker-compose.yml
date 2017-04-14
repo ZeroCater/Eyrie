@@ -3,8 +3,6 @@ services:
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:3001
-    environment:
-      - DEBUG=TRUE
     volumes:
       - .:/code
     env_file: .env

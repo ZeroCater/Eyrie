@@ -16,7 +16,8 @@ from django.views.decorators.csrf import csrf_exempt
 from github import UnknownObjectException, BadCredentialsException
 from social.apps.django_app.default.models import UserSocialAuth
 
-from interface.models import Repo, Document
+from interface.models import Repo
+from documents.models import Document
 from interface.utils import get_github
 
 

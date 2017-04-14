@@ -1,10 +1,3 @@
-import os
-import shutil
-import subprocess
-from pathlib import Path
-
-import dateutil.parser
-import django_rq
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -12,7 +5,7 @@ from django.db import models
 from github import UnknownObjectException
 from social.apps.django_app.default.models import UserSocialAuth
 
-from interface.tasks import process_wiki
+from documents.tasks.wiki_processor import process_wiki
 from interface.utils import get_github
 
 
@@ -109,76 +102,8 @@ class Repo(models.Model):
     def directory(self):
         return 'tmp/{}'.format(self.full_name)
 
-    def clean_directory(self):
-        if os.path.exists(self.directory):
-            shutil.rmtree(self.directory)
-
-    def clone(self, auth):
-        clone_url = self.clone_url
-        clone_url = clone_url.replace('github.com', '{}:{}@github.com'.format(*auth))
-        if not os.path.exists('tmp'):
-            os.makedirs('tmp')
-
-        self.clean_directory()
-
-        directory = self.directory
-
-        subprocess.call([
-            'git', 'clone', clone_url, self.directory
-        ])
-        subprocess.call([
-            'git', '--git-dir=%s/.git' % directory, '--work-tree=%s' % directory, 'fetch', clone_url
-        ])
-        subprocess.call([
-            'git', '--git-dir=%s/.git' % directory, '--work-tree=%s' % directory, 'checkout', self.wiki_branch
-        ])
-
     def enqueue(self):
-        django_rq.enqueue(process_wiki, self.id)
-
-    def parse_fs(self):
-        # Walk through each file in the filesystem
-        # Create/Delete/Update Documents
-
-        p = Path(self.directory)
-
-        def parse_dir(dir):
-            for x in dir.iterdir():
-                full_path = str(x).split('/', maxsplit=1)[1]
-                path, filename = full_path.rsplit('/', maxsplit=1)
-                if filename == '.git':
-                    continue
-                elif x.is_dir():
-                    parse_dir(x)
-                else:
-                    ext = ''
-                    if '.' in filename:
-                        _, ext = filename.rsplit('.', maxsplit=1)
-                    if ext in Document.FILE_TYPES:
-                        with x.open() as f:
-                            body = f.read()
-                            # TODO: Add support for very large files (chunking?)
-
-                        file_path = '{0}/tmp/{1}'.format(os.getcwd(), full_path)
-
-                        git_commit_date = subprocess.check_output([
-                            'git', '--git-dir=%s/.git' % self.directory, '--work-tree=%s' % self.directory,
-                            'log', '-1', '--format=%cd', file_path
-                        ])
-                        commit_date = dateutil.parser.parse(git_commit_date)
-
-                        path = path.replace(self.directory.replace('tmp/', ''), '') + '/'
-                        document = Document.objects.get_or_create(
-                            repo=self,
-                            path=path,
-                            filename=filename,
-                        )
-                        document.body = body
-                        document.commit_date = commit_date
-                        document.full_clean()
-                        document.save()
-
-        parse_dir(p)
+        process_wiki.delay(self.id)
 
     def get_folder_contents(self, path, documents):
         folders = []
@@ -204,19 +129,3 @@ class Repo(models.Model):
         folders.extend(docs)
 
         return folders
-
-
-class Document(models.Model):
-    FILE_TYPES = ('md', 'txt')
-
-    repo = models.ForeignKey(Repo, related_name='documents')
-    path = models.TextField()
-    filename = models.TextField()
-    body = models.TextField(blank=True, db_index=True)
-    commit_date = models.DateTimeField()
-
-    def __str__(self):
-        return '{}{}'.format(self.path, self.filename)
-
-    class Meta:
-        unique_together = ('repo', 'path', 'filename')
