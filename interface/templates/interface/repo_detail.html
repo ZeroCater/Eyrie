@@ -24,8 +24,14 @@
     </div>
 
     <div class="ui text menu">
+        <form id="search-form" method="GET" action="/search/{{ object.full_name }}">
+            <div class="ui small action input item">
+                <input type="text" name="q" placeholder="Search...">
+                <button class="ui icon button" type="submit"><i class="search icon"></i></button>
+            </div>
+        </form>
         {% if is_owner %}
-        <div class="ui item">
+        <div class="ui right item">
             <button id="settings" class="ui icon right aligned big basic button" data-inverted="" data-position="bottom right" data-tooltip="Settings">
                 <i class="icon setting"></i> Settings
             </button>

@@ -7,18 +7,20 @@ from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.core.urlresolvers import reverse
+from django.db import models
 from django.db.models import Count
 from django.http import HttpResponse, Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from github import UnknownObjectException, BadCredentialsException
 from social.apps.django_app.default.models import UserSocialAuth
 
-from interface.models import Repo
 from documents.models import Document
+from interface.models import Repo
 from interface.utils import get_github
 from interface.path_processor import PathProcessor
 
@@ -203,6 +205,39 @@ def ProcessRepo(request, full_name):
 
     url = reverse('repo_detail', kwargs={'full_name': repo.full_name})
     return redirect(url)
+
+
+def search_view(request, full_name):
+    query_text = request.GET.get('q', None)
+    if not query_text:
+        raise Http404
+
+    repo = get_object_or_404(Repo, full_name=full_name)
+
+    vector = SearchVector('body')
+    query = SearchQuery(query_text+':*')
+
+    docs = Document.objects.annotate(
+        rank=SearchRank(vector, query),
+        has_title=models.Case(
+            models.When(filename__icontains=query_text, then=1),
+            default=0,
+            output_field=models.IntegerField()
+        )
+    ).exclude(rank=0).order_by('-has_title', '-rank')
+
+    for doc in docs:
+        filename = doc.filename
+        if query_text in filename:
+            filename = filename.replace(query_text, '<strong>{}</strong>'.format(query_text))
+        doc.full_path = doc.path + filename
+
+    context = {
+        'query': query_text,
+        'results': docs,
+        'repo': repo
+    }
+    return render(request, 'interface/search.html', context)
 
 
 def LogoutView(request):

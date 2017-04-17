@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^repo/(?P<full_name>[\w/.-]+)/delete$', views.RepoDeleteView.as_view(), name='repo_delete'),
     url(r'^repo/(?P<full_name>[\w\-_]+/[\w\-_]+)(?P<path>/?[\w/\-._]+)?$',
         views.RepoDetailView.as_view(), name='repo_detail'),
+    url(r'^search/(?P<full_name>[\w\-_]+/[\w\-_]+)', views.search_view, name='search'),
     url(r'^logout$', views.LogoutView, name='logout'),
     url(r'^about$', TemplateView.as_view(template_name='about.html')),
     url(r'^privacy$', TemplateView.as_view(template_name='privacy.html')),
