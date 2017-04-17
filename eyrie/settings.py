@@ -143,7 +143,7 @@ REDIS_URL = os.environ.get('REDIS_URL', 'redis://redis:6379/0')
 
 RQ_QUEUES = {
     'default': {
-        'URL': os.environ.get('REDIS_URL', 'redis://redis:6379/0'),
+        'URL': REDIS_URL,
         'DEFAULT_TIMEOUT': 360,
     }
 }
