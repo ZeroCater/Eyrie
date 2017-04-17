@@ -8,6 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'Thisisaterriblesecret22sdadlsdajdlsdalda')
 DEBUG = strtobool(os.environ.get('DEBUG', 'False'))
+ASYNC = strtobool(os.environ.get('ASYNC', 'True'))
 
 HOSTNAME = os.environ.get('HOSTNAME', 'localhost')
 ALLOWED_HOSTS = ['*']
@@ -25,7 +26,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'social.apps.django_app.default',
     'django.contrib.humanize',
+    'documents',
     'interface',
+    'webhooks',
     'django_rq'
 ]
 
@@ -136,13 +139,15 @@ SOCIAL_AUTH_NEW_USER_REDIRECT_URL = '/repos?welcome=1'
 
 WEBHOOK_SECRET = os.environ.get('WEBHOOK_SECRET', '')
 
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://redis:6379/0')
+
 RQ_QUEUES = {
     'default': {
-        'URL': os.environ.get('REDIS_URL', 'redis://localhost:6379/0'),
+        'URL': REDIS_URL,
         'DEFAULT_TIMEOUT': 360,
     }
 }
-if DEBUG:
+if not ASYNC:
     for queueConfig in RQ_QUEUES.values():
         queueConfig['ASYNC'] = False
 
