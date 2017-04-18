@@ -5,9 +5,6 @@ from interface.path_processor import PathProcessor
 
 class PathProcessTest(TestCase):
 
-    def setUp(self):
-        self.path_processor = PathProcessor('', 'ZeroCater/mp-users')
-
     def path_processor_test(self, path, directory, filename, is_directory=None):
         path_processor = PathProcessor(path, 'ZeroCater/mp-users', is_directory=is_directory)
 
