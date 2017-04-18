@@ -4,9 +4,12 @@ from django.apps import apps
 import os
 import shutil
 import subprocess
+import re
 from pathlib import Path
 
 import dateutil.parser
+
+from interface.path_processor import PathProcessor
 
 
 @job
@@ -36,30 +39,34 @@ def parse_fs(repo, file_change):
     # Walk through each file in the filesystem
     # Create/Delete/Update Documents
     path = Path(repo.directory)
-    parse_dir(path, repo.id, repo.directory, file_change)
+    parse_dir(path, repo.id, repo.full_name, file_change)
 
 
-def parse_dir(dir, repo_id, repo_directory, file_change):
-    for sub_path in dir.iterdir():
-
-        full_path = str(sub_path).split('/', maxsplit=1)[1]
-        path, filename = full_path.rsplit('/', maxsplit=1)
-
-        file_path = full_path.replace(repo_directory.replace('tmp/', ''), '')
-
-        if filename == '.git':
+def parse_dir(dir_path, repo_id, repo_name, file_change):
+    for sub_path in dir_path.iterdir():
+        if re.match('.*/\.git', str(sub_path)):
             continue
+
         if sub_path.is_dir():
-            parse_dir(sub_path, repo_id, repo_directory, file_change)
-        elif not file_change.get('modified', None) or file_path in file_change['modified']:
-            path = path.replace(repo_directory.replace('tmp/', ''), '') + '/'
-            process_file_as_document(sub_path, full_path, repo_id, repo_directory)
+            parse_dir(sub_path, repo_id, repo_name, file_change)
+            continue
+
+        path_processor = PathProcessor(str(sub_path), repo_name)
+
+        git_style_path = path_processor.git_style_path
+        full_path = path_processor.full_path
+
+        if not file_change.get('modified', None) or git_style_path in file_change['modified']:
+            process_file_as_document(full_path, repo_name, repo_id)
 
 
-def process_file_as_document(file_directory, file_path, repo_id, repo_directory):
+def process_file_as_document(full_path, repo_name, repo_id):
     Document = apps.get_model('documents.Document')
 
-    path, filename = file_path.rsplit('/', maxsplit=1)
+    path_processor = PathProcessor(str(full_path), repo_name)
+
+    filename = path_processor.filename
+    directory = path_processor.directory
 
     ext = ''
     if '.' in filename:
@@ -68,22 +75,23 @@ def process_file_as_document(file_directory, file_path, repo_id, repo_directory)
     if not ext in Document.FILE_TYPES:
         return
 
-    with file_directory.open() as f:
+    repo_disk_path = path_processor.repo_disk_path
+    disk_path = path_processor.disk_path
+
+    with Path(disk_path).open() as f:
         body = f.read()
         # TODO: Add support for very large files (chunking?)
 
-    tmp_file_path = '{0}/tmp/{1}'.format(os.getcwd(), file_path)
+    tmp_file_path = '{}/{}'.format(os.getcwd(), disk_path)
 
     git_commit_date = subprocess.check_output([
-        'git', '--git-dir=%s/.git' % repo_directory, '--work-tree=%s' % repo_directory,
+        'git', '--git-dir=%s/.git' % repo_disk_path, '--work-tree=%s' % repo_disk_path,
         'log', '-1', '--format=%cd', tmp_file_path
     ])
     commit_date = dateutil.parser.parse(git_commit_date)
 
-    path = path.replace(repo_directory.replace('tmp/', ''), '') + '/'
-
-    document = Document.objects.filter(repo_id=repo_id, path=path, filename=filename).first()
-    document = document or Document(repo_id=repo_id, path=path, filename=filename)
+    document = Document.objects.filter(repo_id=repo_id, path=directory, filename=filename).first()
+    document = document or Document(repo_id=repo_id, path=directory, filename=filename)
 
     document.body = body
     document.commit_date = commit_date
