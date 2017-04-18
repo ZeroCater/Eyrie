@@ -271,3 +271,6 @@ table.files td.age {
 #search-form {
     margin: 0 2em 0 0;
 }
+span.highlight {
+    background-color: yellow;
+}
