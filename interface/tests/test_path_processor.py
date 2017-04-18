@@ -1,11 +1,5 @@
 from django.test import TestCase
 
-# from model_mommy import mommy
-
-# from documents.models import Document
-# from documents.tasks.wiki_processor import delete_removed_files
-
-
 from interface.path_processor import PathProcessor
 
 
