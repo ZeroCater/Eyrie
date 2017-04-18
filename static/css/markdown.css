@@ -245,3 +245,26 @@ table.files td.age {
     text-align: right;
     white-space: nowrap;
 }
+#readme .commit-date {
+    float: right;
+    color: #5d5d5d;
+    font-weight: 400;
+    margin-right: 1.2em;
+}
+#readme .file-management {
+    float:right;
+}
+#readme .file-management a {
+    color: #58616b;
+    padding: 0.3em 0.6em;
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    margin-right: 6px;
+}
+#readme .file-management a:last-child {
+    margin-right: 0;
+}
+#readme .file-management a:hover {
+    color: #0c0c0c;
+    background-color: #f2f2f2;
+}
