@@ -17,9 +17,9 @@ def process_wiki(repo_id, file_change=None):
     file_change = file_change or {}
 
     Repo = apps.get_model('interface.Repo')
-    try:
-        repo = Repo.objects.get(id=repo_id)
-    except Repo.DoesNotExist:
+    repo = get_repo(repo_id)
+
+    if not repo:
         return 'Invalid Repo ID'
 
     auth = repo.user.get_auth()
@@ -99,15 +99,27 @@ def process_file_as_document(full_path, repo_name, repo_id):
     document.save()
 
 
+def get_repo(repo_id):
+    Repo = apps.get_model('interface.Repo')
+    return Repo.objects.filter(id=repo_id).first()
+
+
 def delete_removed_files(repo_id, file_change):
     if not file_change.get('removed', None):
+        return
+
+    repo = get_repo(repo_id)
+
+    if not repo:
         return
 
     Document = apps.get_model('documents.Document')
 
     for file_path in file_change['removed']:
-        path, filename = file_path.rsplit('/', maxsplit=1)
-        Document.objects.filter(repo_id=repo_id, path="{}/".format(path), filename=filename).delete()
+        path_processor = PathProcessor(repo.full_name, file_path)
+        filename = path_processor.filename
+        path = path_processor.directory
+        Document.objects.filter(repo_id=repo_id, path=path, filename=filename).delete()
 
 
 def clone(clone_url, branch, repo_directory, auth):

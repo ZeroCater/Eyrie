@@ -54,4 +54,4 @@ class PathProcessor(object):
     # Github style paths do not start with a slash
     @property
     def git_style_path(self):
-        return re.match('/(?P<path>(?:.*))', self.path_in_repo).group('path')
+        return re.match('/?(?P<path>(?:.*))', self.path_in_repo).group('path')
