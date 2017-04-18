@@ -51,7 +51,7 @@ def parse_dir(dir_path, repo_id, repo_name, file_change):
             parse_dir(sub_path, repo_id, repo_name, file_change)
             continue
 
-        path_processor = PathProcessor(str(sub_path), repo_name)
+        path_processor = PathProcessor(repo_name, str(sub_path))
 
         git_style_path = path_processor.git_style_path
         full_path = path_processor.full_path
@@ -63,7 +63,7 @@ def parse_dir(dir_path, repo_id, repo_name, file_change):
 def process_file_as_document(full_path, repo_name, repo_id):
     Document = apps.get_model('documents.Document')
 
-    path_processor = PathProcessor(str(full_path), repo_name)
+    path_processor = PathProcessor(repo_name, str(full_path))
 
     filename = path_processor.filename
     directory = path_processor.directory

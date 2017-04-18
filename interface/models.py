@@ -101,7 +101,7 @@ class Repo(models.Model):
 
     @property
     def directory(self):
-        path_processor = PathProcessor('', self.full_name, is_directory=True)
+        path_processor = PathProcessor(self.full_name, is_directory=True)
         return path_processor.repo_disk_path
 
     def enqueue(self, file_change=None):

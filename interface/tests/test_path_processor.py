@@ -6,7 +6,7 @@ from interface.path_processor import PathProcessor
 class PathProcessTest(TestCase):
 
     def path_processor_test(self, path, directory, filename, is_directory=None):
-        path_processor = PathProcessor(path, 'ZeroCater/mp-users', is_directory=is_directory)
+        path_processor = PathProcessor('ZeroCater/mp-users', path, is_directory=is_directory)
 
         self.assertEqual(path_processor.directory, directory)
         self.assertEqual(path_processor.filename, filename)
@@ -93,36 +93,36 @@ class PathProcessTest(TestCase):
 
     def test_repo_disk_path(self):
         path = '/tmp/ZeroCater/mp-users/tests/README.md'
-        path_processor = PathProcessor(path, 'ZeroCater/mp-users')
+        path_processor = PathProcessor('ZeroCater/mp-users', path)
 
         self.assertEqual(path_processor.repo_disk_path, 'tmp/ZeroCater/mp-users')
 
     def test_disk_path(self):
         path = '/tmp/ZeroCater/mp-users/tests/README.md'
-        path_processor = PathProcessor(path, 'ZeroCater/mp-users')
+        path_processor = PathProcessor('ZeroCater/mp-users', path)
 
         self.assertEqual(path_processor.disk_path, 'tmp/ZeroCater/mp-users/tests/README.md')
 
     def test_path_in_repo__file(self):
         path = '/tmp/ZeroCater/mp-users/tests/README.md'
-        path_processor = PathProcessor(path, 'ZeroCater/mp-users')
+        path_processor = PathProcessor('ZeroCater/mp-users', path)
 
         self.assertEqual(path_processor.path_in_repo, '/tests/README.md')
 
     def test_path_in_repo__directory(self):
         path = '/tmp/ZeroCater/mp-users/tests/'
-        path_processor = PathProcessor(path, 'ZeroCater/mp-users', is_directory=True)
+        path_processor = PathProcessor('ZeroCater/mp-users', path, is_directory=True)
 
         self.assertEqual(path_processor.path_in_repo, '/tests/')
 
     def test_full_path(self):
         path = '/tmp/ZeroCater/mp-users/tests/README.md'
-        path_processor = PathProcessor(path, 'ZeroCater/mp-users', is_directory=True)
+        path_processor = PathProcessor('ZeroCater/mp-users', path, is_directory=True)
 
         self.assertEqual(path_processor.full_path, 'ZeroCater/mp-users/tests/README.md')
 
     def test_git_style_path(self):
         path = '/tmp/ZeroCater/mp-users/tests/README.md'
-        path_processor = PathProcessor(path, 'ZeroCater/mp-users', is_directory=True)
+        path_processor = PathProcessor('ZeroCater/mp-users', path, is_directory=True)
 
         self.assertEqual(path_processor.git_style_path, 'tests/README.md')

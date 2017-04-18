@@ -3,22 +3,27 @@ import re
 
 class PathProcessor(object):
 
-    def __init__(self, raw_path, repo_name, is_directory=None):
+    def __init__(self, repo_name, raw_path=None, is_directory=None, directory=None, filename=None):
         self.repo_name = repo_name
         self.is_directory = is_directory
-        self.directory = None
-        self.filename = None
+        self.raw_path = raw_path
+        self.directory = directory or None
+        self.filename = filename or None
 
-        if is_directory:
+        if raw_path:
+            self.process()
+
+    def process(self):
+        if self.is_directory:
             regex = re.match(
                 "/?(?P<tmp>(?:tmp))?/?(?P<repo>(?:{}))?(?P<directory>(?:/?.*))/?".format(
-                    repo_name), raw_path, re.IGNORECASE)
+                    self.repo_name), self.raw_path, re.IGNORECASE)
             if regex:
                 self.directory = regex.group('directory')
         else:
             regex = re.match(
                 "/?(?P<tmp>(?:tmp))?/?(?P<repo>(?:{}))?(?P<directory>(?:/?.*))/(?P<filename>(?:.+))".format(
-                    repo_name), raw_path, re.IGNORECASE)
+                    self.repo_name), self.raw_path, re.IGNORECASE)
 
             if regex:
                 self.directory = regex.group('directory') if regex.group('directory') else '/'
