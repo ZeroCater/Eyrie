@@ -54,6 +54,7 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
         path = kwargs.get('path')
 
         path = path or '/'
+
         path_processor = PathProcessor(repo_name, path)
         is_directory = False
 
@@ -90,10 +91,11 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
         context['base_url'] = request.build_absolute_uri(self.object.get_absolute_url())
         b_tuples = []
         if path != '/':
+            path = path[1:]
             breadcrumbs = path.split('/')
             for b in breadcrumbs:
                 if not b_tuples:
-                    url = '{0}{1}/'.format(context['base_url'], b)
+                    url = '{0}/{1}/'.format(context['base_url'], b)
                 else:
                     url = '{0}{1}/'.format(b_tuples[-1][0], b)
                 b_tuples.append((url, b))
