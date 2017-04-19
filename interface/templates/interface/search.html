@@ -34,7 +34,7 @@
 
     <div class="ui large divided relaxed selection list" id="search_results">
     {% for result in results %}
-        <a class="item repo_link" href="/repo/{{ repo.full_name }}{{ result }}?search={{ query }}">
+        <a class="item repo_link" href="{{ result.get_absolute_url }}?search={{ query }}">
             <div class="content">
                 <span>{{ result.full_path|safe }}</span>
             </div>

@@ -7,9 +7,7 @@ from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.core.urlresolvers import reverse
-from django.db import models
 from django.db.models import Count
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect, render, get_object_or_404
@@ -219,23 +217,13 @@ def search_view(request, full_name):
     if repo.is_private and not is_collab:
         raise Http404('You are not allowed to view this Repo')
 
-    vector = SearchVector('body')
-    query = SearchQuery(query_text+':*')
-
-    docs = Document.objects.annotate(
-        rank=SearchRank(vector, query),
-        has_title=models.Case(
-            models.When(filename__icontains=query_text, then=1),
-            default=0,
-            output_field=models.IntegerField()
-        )
-    ).exclude(rank=0).filter(repo=repo).order_by('-has_title', '-rank')
+    docs = repo.search_documents(query_text)
 
     for doc in docs:
         filename = doc.filename
         if query_text in filename:
             filename = filename.replace(query_text, '<strong>{}</strong>'.format(query_text))
-        doc.full_path = doc.path + filename
+        doc.full_path = '{}/{}'.format(doc.path, filename)
 
     context = {
         'query': query_text,
