@@ -214,6 +214,11 @@ def search_view(request, full_name):
 
     repo = get_object_or_404(Repo, full_name=full_name)
 
+    is_collab = repo.user_is_collaborator(request.user)
+
+    if repo.is_private and not is_collab:
+        raise Http404('You are not allowed to view this Repo')
+
     vector = SearchVector('body')
     query = SearchQuery(query_text+':*')
 
