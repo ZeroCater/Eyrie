@@ -224,7 +224,7 @@ def search_view(request, full_name):
             default=0,
             output_field=models.IntegerField()
         )
-    ).exclude(rank=0).order_by('-has_title', '-rank')
+    ).exclude(rank=0).filter(repo=repo).order_by('-has_title', '-rank')
 
     for doc in docs:
         filename = doc.filename
