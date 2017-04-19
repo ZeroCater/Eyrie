@@ -95,7 +95,7 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
             breadcrumbs = path.split('/')
             for b in breadcrumbs:
                 if not b_tuples:
-                    url = '{0}{1}/'.format(context['base_url'], b)
+                    url = '{0}/{1}/'.format(context['base_url'], b)
                 else:
                     url = '{0}{1}/'.format(b_tuples[-1][0], b)
                 b_tuples.append((url, b))
