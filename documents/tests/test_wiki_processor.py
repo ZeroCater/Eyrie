@@ -11,8 +11,8 @@ from interface.path_processor import PathProcessor
 class DeleteRemovedFileTest(TestCase):
 
     def setUp(self):
-        self.repo = mommy.make_recipe('eyrie.repo')
-        self.document = mommy.make_recipe('eyrie.document', repo=self.repo)
+        self.repo = mommy.make_recipe('eyrie.repo', full_name='Zerocater/test')
+        self.document = mommy.make_recipe('eyrie.document', repo=self.repo, path='/files')
 
     def test_should_remove_document_passed_in_removed(self):
         document_id = self.document.id

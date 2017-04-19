@@ -64,22 +64,22 @@ class PathProcessTest(TestCase):
     def test_directory_path__w_tmp_wo_leading_slash__root(self):
         path = 'tmp/ZeroCater/mp-users'
 
-        self.path_processor_test(path, '', None, is_directory=True)
+        self.path_processor_test(path, '/', None, is_directory=True)
 
     def test_directory_path__w_tmp_wo_leading_slash__directory(self):
         path = 'tmp/ZeroCater/mp-users/tests/'
 
-        self.path_processor_test(path, '/tests/', None, is_directory=True)
+        self.path_processor_test(path, '/tests', None, is_directory=True)
 
     def test_directory_path__wo_tmp_w_leading_slash__root(self):
         path = '/ZeroCater/mp-users'
 
-        self.path_processor_test(path, '', None, is_directory=True)
+        self.path_processor_test(path, '/', None, is_directory=True)
 
     def test_directory_path__wo_tmp_w_leading_slash__directory(self):
         path = '/ZeroCater/mp-users/tests/'
 
-        self.path_processor_test(path, '/tests/', None, is_directory=True)
+        self.path_processor_test(path, '/tests', None, is_directory=True)
 
     def test_directory_path__wo_tmp_wo_leading_slash__root(self):
         path = 'ZeroCater/mp-users/'
@@ -113,7 +113,7 @@ class PathProcessTest(TestCase):
         path = '/tmp/ZeroCater/mp-users/tests/'
         path_processor = PathProcessor('ZeroCater/mp-users', path, is_directory=True)
 
-        self.assertEqual(path_processor.path_in_repo, '/tests/')
+        self.assertEqual(path_processor.path_in_repo, '/tests')
 
     def test_full_path(self):
         path = '/tmp/ZeroCater/mp-users/tests/README.md'
