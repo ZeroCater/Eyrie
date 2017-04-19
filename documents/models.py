@@ -11,7 +11,7 @@ class Document(models.Model):
     commit_date = models.DateTimeField()
 
     def __str__(self):
-        return '{}{}'.format(self.path, self.filename)
+        return '{}/{}'.format(self.path, self.filename)
 
     class Meta:
         unique_together = ('repo', 'path', 'filename')

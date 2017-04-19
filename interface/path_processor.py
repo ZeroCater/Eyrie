@@ -26,8 +26,16 @@ class PathProcessor(object):
                     self.repo_name), self.raw_path, re.IGNORECASE)
 
             if regex:
-                self.directory = regex.group('directory') if regex.group('directory') else '/'
+                self.directory = regex.group('directory')
                 self.filename = regex.group('filename')
+
+        self.directory = self.directory or '/'
+
+        if re.match('^[^/].*', self.directory):
+            self.directory = "/{}".format(self.directory)
+
+        if re.match('.+/$', self.directory):
+            self.directory = self.directory[:-1]
 
     @property
     def repo_disk_path(self):

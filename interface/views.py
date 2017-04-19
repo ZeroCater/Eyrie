@@ -19,6 +19,7 @@ from social.apps.django_app.default.models import UserSocialAuth
 from interface.models import Repo
 from documents.models import Document
 from interface.utils import get_github
+from interface.path_processor import PathProcessor
 
 
 class RepoDetailView(generic.DetailView, generic.UpdateView):
@@ -39,12 +40,16 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
         if self.object.is_private and not is_collab:
             raise Http404('You are not allowed to view this Repo')
 
+        repo_name = self.object.full_name
+
         if is_collab:
             g = get_github(self.object.user)
-            grepo = g.get_repo(self.object.full_name)
+            grepo = g.get_repo(repo_name)
             context['branches'] = [i.name for i in grepo.get_branches()]
 
         path = kwargs.get('path')
+
+        path_processor = PathProcessor(repo_name, path)
 
         if path is None:
             path = '/'
@@ -61,24 +66,28 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
             context['breadcrumbs'] = b_tuples
             path = '/{}'.format(path)
 
-        context['path'] = path
-
         try:
             # Viewing a single file
-            trunc_path, filename = path.rsplit('/', maxsplit=1)
-            trunc_path = '{}/'.format(trunc_path)
+            filename = path_processor.filename
+            trunc_path = path_processor.directory
             context['document'] = Document.objects.get(repo=self.object, path=trunc_path, filename=filename)
             documents = []
-        except:
+        except Document.DoesNotExist:
+            path_processor = PathProcessor(repo_name, path, is_directory=True)
+            filename = path_processor.filename
+            trunc_path = path_processor.directory
+            context['directory'] = True
             try:
                 # Viewing a folder with a README
-                context['document'] = Document.objects.get(repo=self.object, path=path, filename__startswith='README')
+                context['document'] = Document.objects.get(
+                    repo=self.object, path=trunc_path, filename__startswith='README')
             except Document.DoesNotExist:
                 # Viewing a folder without a README
                 pass
-            documents = Document.objects.filter(repo=self.object, path__startswith=path)
+            documents = Document.objects.filter(repo=self.object, path__startswith=trunc_path)
 
-        context['files'] = self.object.get_folder_contents(path, documents)
+        context['path'] = path_processor.path_in_repo
+        context['files'] = self.object.get_folder_contents(trunc_path, documents)
 
         if len(context['files']) == 0 and 'document' not in context:
             raise Http404
