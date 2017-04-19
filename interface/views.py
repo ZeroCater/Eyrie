@@ -43,10 +43,13 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
 
         repo_name = self.object.full_name
 
+        branches = []
         if is_collab:
             g = get_github(self.object.user)
             grepo = g.get_repo(repo_name)
-            context['branches'] = [i.name for i in grepo.get_branches()]
+            branches = [i.name for i in grepo.get_branches()]
+
+        context['branches'] = branches
 
         path = kwargs.get('path')
 
@@ -58,22 +61,22 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
             # Viewing a single file
             filename = path_processor.filename
             trunc_path = path_processor.directory
-            context['document'] = Document.objects.get(repo=self.object, path=trunc_path, filename=filename)
+            document = Document.objects.get(repo=self.object, path=trunc_path, filename=filename)
             documents = []
         except Document.DoesNotExist:
             path_processor = PathProcessor(repo_name, path, is_directory=True)
-            filename = path_processor.filename
             trunc_path = path_processor.directory
             is_directory = True
             try:
                 # Viewing a folder with a README
-                context['document'] = Document.objects.get(
-                    repo=self.object, path=trunc_path, filename__startswith='README')
+                document = Document.objects.get(
+                    repo=self.object, path=trunc_path, filename__istartswith='README')
             except Document.DoesNotExist:
                 # Viewing a folder without a README
-                pass
+                document = None
             documents = Document.objects.filter(repo=self.object, path__startswith=trunc_path)
 
+        context['document'] = document
         context['path'] = path_processor.path_in_repo
         context['files'] = self.object.get_folder_contents(trunc_path, documents)
         context['directory'] = is_directory
@@ -85,16 +88,17 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
             raise Http404
 
         context['base_url'] = request.build_absolute_uri(self.object.get_absolute_url())
+        b_tuples = []
         if path != '/':
             breadcrumbs = path.split('/')
-            b_tuples = []
             for b in breadcrumbs:
                 if not b_tuples:
                     url = '{0}{1}/'.format(context['base_url'], b)
                 else:
                     url = '{0}{1}/'.format(b_tuples[-1][0], b)
                 b_tuples.append((url, b))
-            context['breadcrumbs'] = b_tuples
+
+        context['breadcrumbs'] = b_tuples
 
         return self.render_to_response(context)
 
