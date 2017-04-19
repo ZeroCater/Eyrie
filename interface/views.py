@@ -84,9 +84,9 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
         if len(context['files']) == 0 and 'document' not in context:
             raise Http404
 
+        context['base_url'] = request.build_absolute_uri(self.object.get_absolute_url())
         if path != '/':
             breadcrumbs = path.split('/')
-            context['base_url'] = request.build_absolute_uri(self.object.get_absolute_url())
             b_tuples = []
             for b in breadcrumbs:
                 if not b_tuples:
