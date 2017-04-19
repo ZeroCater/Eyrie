@@ -122,8 +122,7 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
             return redirect(reverse('social:begin', args=['github'])) + '?next=' + request.path
 
         self.object_list = Repo.objects.filter(
-            full_name__in=[i.full_name for i in repos],
-            disabled=False
+            full_name__in=[i.full_name for i in repos]
         ).annotate(doc_count=Count('documents'))
 
         names = [x.full_name for x in self.object_list]
@@ -150,20 +149,20 @@ class RepoDeleteView(generic.DetailView):
     def dispatch(self, request, *args, **kwargs):
         return super(RepoDeleteView, self).dispatch(request, *args, **kwargs)
 
-    def soft_delete(self, request):
+    def check_and_delete(self, request):
         obj = self.get_object()
 
         if not obj.user_is_collaborator(request.user):
             raise Http404('You are not allowed to delete this repo')
 
-        obj.soft_delete()
+        obj.delete()
 
     def get(self, request, *args, **kwargs):
-        self.soft_delete(request)
+        self.check_and_delete(request)
         return redirect(reverse('repo_list'))
 
-    def delete(self, request):
-        self.soft_delete(request)
+    def delete(self, request, **kwargs):
+        self.check_and_delete(request)
         return HttpResponse(status=204)
 
 
@@ -184,7 +183,6 @@ def ProcessRepo(request, full_name):
 
     try:
         repo = Repo.objects.get(full_name=grepo.full_name)
-        repo.disabled = False
         repo.is_private = grepo.private
         repo.save()
     except Repo.DoesNotExist:
