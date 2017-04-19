@@ -34,7 +34,6 @@ class Repo(models.Model):
 
     wiki_branch = models.TextField(default='master')
 
-    disabled = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -50,9 +49,9 @@ class Repo(models.Model):
     def clone_url(self):
         return 'https://github.com/{}.git'.format(self.full_name)
 
-    def soft_delete(self):
-        self.disabled = True
+    def delete(self, *args, **kwargs):
         self.remove_webhook()
+        return super(Repo, self).delete(*args, **kwargs)
 
     def remove_webhook(self):
         if not settings.DEBUG:
