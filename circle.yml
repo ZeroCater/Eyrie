@@ -6,11 +6,13 @@ machine:
   environment:
     DATABASE_URL: postgres://ubuntu:@127.0.0.1:5432/circle_test
     DEBUG: TRUE
+    COVERALLS_REPO_TOKEN: eNJ0BpB8xD3ETRVbfyQ4nlFKB3rtdYkj7
 dependencies:
   post:
     - pip install coverage==4.1
     - pip install coveralls==1.1
     - pip install mock==2.0.0
+    - pip install model_mommy==1.3.2
 test:
   override:
     - coverage run --source=. manage.py test

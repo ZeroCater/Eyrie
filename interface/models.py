@@ -7,6 +7,7 @@ from social.apps.django_app.default.models import UserSocialAuth
 
 from documents.tasks.wiki_processor import process_wiki
 from interface.utils import get_github
+from interface.path_processor import PathProcessor
 
 
 class UserProxy(User):
@@ -100,7 +101,8 @@ class Repo(models.Model):
 
     @property
     def directory(self):
-        return 'tmp/{}'.format(self.full_name)
+        path_processor = PathProcessor(self.full_name, is_directory=True)
+        return path_processor.repo_disk_path
 
     def enqueue(self, file_change=None):
         file_change = file_change or {}
