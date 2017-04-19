@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import re
 
 from django.conf import settings
 from django.contrib.auth import logout
@@ -49,22 +50,9 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
 
         path = kwargs.get('path')
 
+        path = path or '/'
         path_processor = PathProcessor(repo_name, path)
-
-        if path is None:
-            path = '/'
-        else:
-            breadcrumbs = path.split('/')
-            context['base_url'] = request.build_absolute_uri(self.object.get_absolute_url())
-            b_tuples = []
-            for b in breadcrumbs:
-                if not b_tuples:
-                    url = '{0}{1}/'.format(context['base_url'], b)
-                else:
-                    url = '{0}{1}/'.format(b_tuples[-1][0], b)
-                b_tuples.append((url, b))
-            context['breadcrumbs'] = b_tuples
-            path = '/{}'.format(path)
+        is_directory = False
 
         try:
             # Viewing a single file
@@ -76,7 +64,7 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
             path_processor = PathProcessor(repo_name, path, is_directory=True)
             filename = path_processor.filename
             trunc_path = path_processor.directory
-            context['directory'] = True
+            is_directory = True
             try:
                 # Viewing a folder with a README
                 context['document'] = Document.objects.get(
@@ -88,9 +76,25 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
 
         context['path'] = path_processor.path_in_repo
         context['files'] = self.object.get_folder_contents(trunc_path, documents)
+        context['directory'] = is_directory
+
+        if is_directory and re.match('.+[^/]$', request.path):
+            return redirect(request.path + '/')
 
         if len(context['files']) == 0 and 'document' not in context:
             raise Http404
+
+        if path != '/':
+            breadcrumbs = path.split('/')
+            context['base_url'] = request.build_absolute_uri(self.object.get_absolute_url())
+            b_tuples = []
+            for b in breadcrumbs:
+                if not b_tuples:
+                    url = '{0}{1}/'.format(context['base_url'], b)
+                else:
+                    url = '{0}{1}/'.format(b_tuples[-1][0], b)
+                b_tuples.append((url, b))
+            context['breadcrumbs'] = b_tuples
 
         return self.render_to_response(context)
 
