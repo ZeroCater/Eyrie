@@ -3,15 +3,16 @@ from unittest.mock import patch
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from model_mommy import mommy
 
-from documents.models import Document
-from interface.models import Repo, UserProxy
+from interface.models import Repo
 
 
 class RepoTestCase(TestCase):
     def setUp(self):
-        self.user = UserProxy.objects.create(username='test')
-        self.repo = Repo.objects.create(full_name='test/test', user=self.user)
+        self.user = mommy.make_recipe('eyrie.user', username='test')
+        self.repo = mommy.make_recipe('eyrie.repo', full_name='test/test', user=self.user)
+        self.document = mommy.make_recipe('eyrie.document', repo=self.repo, path='/test/dir')
 
     @patch('interface.models.Repo.remove_webhook')
     def test_delete(self, mock_delete):
@@ -26,13 +27,13 @@ class RepoTestCase(TestCase):
 
     def test_search(self):
         now = timezone.now()
-        doc1 = Document.objects.create(
+        doc1 = mommy.make_recipe('eyrie.document',
             repo=self.repo, path='/test/dir', filename='test.md', commit_date=now, body='This is a test'
         )
-        doc2 = Document.objects.create(
+        doc2 =  mommy.make_recipe('eyrie.document',
             repo=self.repo, path='/test/dir', filename='fail.md', commit_date=now, body='This is a fail'
         )
-        doc3 = Document.objects.create(
+        doc3 =  mommy.make_recipe('eyrie.document',
             repo=self.repo, path='/test/dir', filename='different.md', commit_date=now, body='This is also a test'
         )
 
