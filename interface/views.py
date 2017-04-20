@@ -10,15 +10,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.http import HttpResponse, Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from github import UnknownObjectException, BadCredentialsException
 from social.apps.django_app.default.models import UserSocialAuth
 
-from interface.models import Repo
 from documents.models import Document
+from interface.models import Repo
 from interface.utils import get_github
 from interface.path_processor import PathProcessor
 
@@ -203,6 +203,34 @@ def ProcessRepo(request, full_name):
 
     url = reverse('repo_detail', kwargs={'full_name': repo.full_name})
     return redirect(url)
+
+
+def search_view(request, full_name):
+    query_text = request.GET.get('q', None)
+    if not query_text:
+        raise Http404
+
+    repo = get_object_or_404(Repo, full_name=full_name)
+
+    is_collab = repo.user_is_collaborator(request.user)
+
+    if repo.is_private and not is_collab:
+        raise Http404('You are not allowed to view this Repo')
+
+    docs = repo.search_documents(query_text)
+
+    for doc in docs:
+        filename = doc.filename
+        if query_text in filename:
+            filename = filename.replace(query_text, '<strong>{}</strong>'.format(query_text))
+        doc.full_path = '{}/{}'.format(doc.path, filename)
+
+    context = {
+        'query': query_text,
+        'results': docs,
+        'repo': repo
+    }
+    return render(request, 'interface/search.html', context)
 
 
 def LogoutView(request):

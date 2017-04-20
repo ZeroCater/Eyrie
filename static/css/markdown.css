@@ -268,3 +268,9 @@ table.files td.age {
     color: #0c0c0c;
     background-color: #f2f2f2;
 }
+#search-form {
+    margin: 0 2em 0 0;
+}
+span.highlight {
+    background-color: yellow;
+}

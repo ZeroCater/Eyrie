@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Eyrie - Search{% endblock %}
+
+{% block extra_head %}
+    <style>
+    #search_results a {
+        color: #4183C4;
+        padding: 0.7em 0;
+    }
+    #search_results strong {
+        color: #03101d;
+    }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="ui text menu">
+        <div class="ui item">
+            <div class="ui large breadcrumb">
+                {% include 'interface/breadcrumbs.html' with page_name=repo.full_name %}
+            </div>
+        </div>
+        {% include 'interface/user_dropdown.html' with private=repo.is_private %}
+    </div>
+    <div class="ui text menu">
+        <form id="search-form" method="GET" action="/search/{{ repo.full_name }}">
+            <div class="ui small action input item">
+                <input type="text" name="q" placeholder="Search..." value="{{ query }}">
+                <button class="ui icon button" type="submit"><i class="search icon"></i></button>
+            </div>
+        </form>
+    </div>
+
+    <div class="ui large divided relaxed selection list" id="search_results">
+    {% for result in results %}
+        <a class="item repo_link" href="{{ result.get_absolute_url }}?search={{ query }}">
+            <div class="content">
+                <span>{{ result.full_path|safe }}</span>
+            </div>
+        </a>
+    {% endfor %}
+    </div>
+{% endblock %}

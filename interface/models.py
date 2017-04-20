@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.core.urlresolvers import reverse
 from django.db import models
 from github import UnknownObjectException
@@ -131,3 +132,18 @@ class Repo(models.Model):
         folders.extend(docs)
 
         return folders
+
+    def search_documents(self, query_text):
+        vector = SearchVector('body')
+        query = SearchQuery(query_text + ':*')
+
+        docs = self.documents.annotate(
+            rank=SearchRank(vector, query),
+            has_title=models.Case(
+                models.When(filename__icontains=query_text, then=1),
+                default=0,
+                output_field=models.IntegerField()
+            )
+        ).exclude(rank=0).order_by('-has_title', '-rank')
+
+        return docs
