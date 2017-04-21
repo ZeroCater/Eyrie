@@ -223,7 +223,7 @@ def search_view(request, full_name):
         filename = doc.filename
         if query_text in filename:
             filename = filename.replace(query_text, '<strong>{}</strong>'.format(query_text))
-        doc.full_path = '{}/{}'.format(doc.path, filename)
+        doc.search_path = '{}/{}'.format(doc.path, filename)
 
     context = {
         'query': query_text,

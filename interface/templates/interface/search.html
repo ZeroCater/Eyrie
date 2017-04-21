@@ -36,7 +36,7 @@
     {% for result in results %}
         <a class="item repo_link" href="{{ result.get_absolute_url }}?search={{ query }}">
             <div class="content">
-                <span>{{ result.full_path|safe }}</span>
+                <span>{{ result.search_path|safe }}</span>
             </div>
         </a>
     {% endfor %}

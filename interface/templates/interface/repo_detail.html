@@ -30,14 +30,12 @@
                 <button class="ui icon button" type="submit"><i class="search icon"></i></button>
             </div>
         </form>
-        {% if is_owner %}
         <div class="ui right item">
+            {% if is_owner %}
             <button id="settings" class="ui icon right aligned big basic button" data-inverted="" data-position="bottom right" data-tooltip="Settings">
-                <i class="icon setting"></i> Settings
+                <i class="icon setting"></i>
             </button>
-        </div>
-        {% endif %}
-        <div class="ui right item">
+            {% endif %}
             {% if document and not files %}
             <a target="_blank" class="ui icon left aligned big basic button link" href="{{ document.github_view_link }}">
             {% else %}

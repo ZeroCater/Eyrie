@@ -274,3 +274,6 @@ table.files td.age {
 span.highlight {
     background-color: yellow;
 }
+#settings {
+    margin-right: 1em;
+}
