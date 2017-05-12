@@ -37,12 +37,8 @@ class Search(object):
         github_repos = github.get_user().get_repos()
         return [repo for repo in github_repos]
 
-    def get_repos(self):
-        github_repos = self.get_user_github_repos()
-        return github_repos
-
     def get_repo_names(self):
-        github_repos = self.get_repos()
+        github_repos = self.get_user_github_repos()
         repo_names = [repo.full_name for repo in github_repos]
         return repo_names
 
