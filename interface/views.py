@@ -18,6 +18,7 @@ from github import UnknownObjectException, BadCredentialsException
 from social.apps.django_app.default.models import UserSocialAuth
 
 from documents.models import Document
+from documents.search import Search
 from interface.models import Repo
 from interface.utils import get_github
 from interface.path_processor import PathProcessor
@@ -205,31 +206,20 @@ def ProcessRepo(request, full_name):
     return redirect(url)
 
 
-def search_view(request, full_name):
+def search_view(request):
     query_text = request.GET.get('q', None)
     if not query_text:
         raise Http404
 
-    repo = get_object_or_404(Repo, full_name=full_name)
+    search = Search(request.user, query_text)
 
-    is_collab = repo.user_is_collaborator(request.user)
-
-    if repo.is_private and not is_collab:
-        raise Http404('You are not allowed to view this Repo')
-
-    docs = repo.search_documents(query_text)
-
-    for doc in docs:
-        filename = doc.filename
-        if query_text in filename:
-            filename = filename.replace(query_text, '<strong>{}</strong>'.format(query_text))
-        doc.search_path = '{}/{}'.format(doc.path, filename)
+    docs = search.perform()
 
     context = {
         'query': query_text,
-        'results': docs,
-        'repo': repo
+        'results': docs
     }
+
     return render(request, 'interface/search.html', context)
 
 
