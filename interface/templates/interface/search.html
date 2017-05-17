@@ -18,13 +18,13 @@
     <div class="ui text menu">
         <div class="ui item">
             <div class="ui large breadcrumb">
-                {% include 'interface/breadcrumbs.html' with page_name=repo.full_name %}
+                {% include 'interface/breadcrumbs.html' with page_name='Search' %}
             </div>
         </div>
-        {% include 'interface/user_dropdown.html' with private=repo.is_private %}
+        {% include 'interface/user_dropdown.html' with private=False %}
     </div>
     <div class="ui text menu">
-        <form id="search-form" method="GET" action="/search/{{ repo.full_name }}">
+        <form id="search-form" method="GET" action="/search">
             <div class="ui small action input item">
                 <input type="text" name="q" placeholder="Search..." value="{{ query }}">
                 <button class="ui icon button" type="submit"><i class="search icon"></i></button>
@@ -33,12 +33,15 @@
     </div>
 
     <div class="ui large divided relaxed selection list" id="search_results">
-    {% for result in results %}
-        <a class="item repo_link" href="{{ result.get_absolute_url }}?search={{ query }}">
-            <div class="content">
-                <span>{{ result.search_path|safe }}</span>
-            </div>
-        </a>
+    {% for repo_name, repo_results in results.items %}
+        <h1 class="ui header">{{ repo_name }}</h1>
+        {% for result in repo_results %}
+            <a class="item repo_link" href="{{ result.get_absolute_url }}?search={{ query }}">
+                <div class="content">
+                    <span>{{ result.search_path|safe }}</span>
+                </div>
+            </a>
+        {% endfor %}
     {% endfor %}
     </div>
 {% endblock %}
