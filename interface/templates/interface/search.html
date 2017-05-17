@@ -18,10 +18,10 @@
     <div class="ui text menu">
         <div class="ui item">
             <div class="ui large breadcrumb">
-                {% include 'interface/breadcrumbs.html' %}
+                {% include 'interface/breadcrumbs.html' with page_name='Search' %}
             </div>
         </div>
-        {% include 'interface/user_dropdown.html' %}
+        {% include 'interface/user_dropdown.html' with private=False %}
     </div>
     <div class="ui text menu">
         <form id="search-form" method="GET" action="/search">
