@@ -2,15 +2,15 @@
 
 <html>
 <head>
-    <title>{% if DEBUG %}[DEBUG] {% endif %}Linty: Free code linting</title>
+    <title>{% if DEBUG %}[DEBUG] {% endif %}Eyrie: Docs Browser</title>
     <meta charset="UTF-8"/>
-    <meta name="description" content="Free automated code linting"/>
-    <meta name="keywords" content="code,lint,linty,pep8,pycodestyle,eslint,ci"/>
+    <meta name="description" content="Documentation browser for GitHub repos"/>
+    <meta name="keywords" content="docs,wiki,github,browse,documentation"/>
     <meta property="og:type" content="website"/>
-    <meta property="og:site_name" content="Linty"/>
-    <meta property="og:url" content="https://www.lintyapp.com"/>
-    <meta property="og:title" content="Linty: Free code linting"/>
-    <meta property="og:description" content="Free automated code linting"/>
+    <meta property="og:site_name" content="Eyrie"/>
+    <meta property="og:url" content="https://www.eyrieapp.com"/>
+    <meta property="og:title" content="Eyrie: Docs Browser"/>
+    <meta property="og:description" content="Documentation browser for GitHub repos"/>
 
     <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css">
@@ -37,40 +37,13 @@
             </div>
         </div>
         <div class="ui text container">
-            <h1 class="ui inverted header">Linty</h1>
-            <h2>Linting as a Service</h2>
+            <h1 class="ui inverted header">Eyrie</h1>
+            <h2>Documentation browser for GitHub repos</h2>
             <br>
             <a class="ui huge violet button" href="{% url 'social:begin' 'github' %}">
                 <i class="icon github"></i>
                 Sign Up With Github
             </a>
-        </div>
-    </div>
-
-    <div class="ui vertical stripe segment">
-        <div class="ui middle aligned stackable grid container">
-            <div class="row">
-                <div class="eight wide column">
-                    <h3 class="ui header">Simple to set up</h3>
-                    <p>Users can sign in with Github, select a repo, insert your Linty badge, and immediately get
-                        linting for their code.</p>
-                    <h3 class="ui header">All the features you expect</h3>
-                    <p>From pass/fail statuses on Pull Requests to linting history, Linty has all the features you
-                        depend on from competing services.</p>
-                </div>
-                <div class="six wide right floated column">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1024px-Python-logo-notext.svg.png"
-                         class="ui large rounded image">
-                </div>
-            </div>
-            <div class="row">
-                <div class="center aligned column">
-                    <a class="ui huge primary button" href="{% url 'social:begin' 'github' %}">
-                        Connect with Github
-                        <i class="big icon github"></i>
-                    </a>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -84,7 +57,7 @@
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-18074590-5', 'auto');
+  ga('create', 'UA-18074590-6', 'auto');
   ga('send', 'pageview');
 
 </script>
