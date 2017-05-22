@@ -2,7 +2,7 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block title %}Linty - About{% endblock %}
+{% block title %}Eyrie - About{% endblock %}
 
 {% block body %}
     <div class="ui text menu">
@@ -14,20 +14,22 @@
         {% include 'interface/user_dropdown.html' with private=True %}
     </div>
     <div class="ui container">
-        <h1 class="ui header center aligned">What is Linty?</h1>
-        <p class="description center aligned">
-            Linty is linting-as-a-service.
+        <h1 class="ui header center aligned">What is Eyrie?</h1>
+        <p class="description">
+            Eyrie is our attempt to build what we thought the GitHub wiki should be, using GitHub pages as an example.
+            Users can create documentation for their repo by creating an orphan branch in the repository and putting documentation there.
+            When a user adds their repo to Eyrie, they can select the branch they'd like Eyrie to follow.
+            Because Eyrie uses a branch in the repository itself, users can use pull requests and other git workflows.
+            The repository can have directories, rather than just a flat list of documents.
+            Eyrie also allows users to search across multiple repositories.
         </p>
         <p class="description">
-            Users sign in with their GitHub account, and select repositories they'd like Linty to review.
-            Linty then watches all commits to that repository and checks the code style to see if it adhere's to the project's own rules, or Linty's defaults.
-            Pull requests on watched repositories can receive <a href="https://help.github.com/articles/about-required-status-checks/">status checks</a> indicating the pass/fail status of the latest commit.
-            Repository owners can make Linty required, forcing all new code to adhere to a style code, resulting in a consistent style throughout the codebase.
+            Eyrie is maintained by <a href="https://zerocater.com">ZeroCater</a> and was created in response to our growing need to maintain and browse documentation,
+            while keeping our standard GitHub workflows in place. We wanted our documentation to be treated like code.
+            Because Eyrie is <a href="https://github.com/ZeroCater/Eyrie">open source</a>, anyone with experience with Python/Django is welcome to contribute.
         </p>
         <p class="description">
-            Linty is maintained by <a href="https://zerocater.com">ZeroCater</a> and was created to assist with keeping our own projects consistent and clean.
-            Because Linty is <a href="https://github.com/ZeroCater/linty">open source</a>, anyone with experience with Python/Django is welcome to contribute.
-            You can view the project's Trello board <a href="https://trello.com/b/w6mQAxUG/linty">here</a>.
+            Eyrie was created as a fork of <a href="https://www.lintyapp.com">Linty</a>, another open-source project of ours, and can be found on GitHub <a href="https://github.com/ZeroCater/linty">here</a>.
         </p>
     </div>
 {% endblock %}

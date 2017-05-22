@@ -2,7 +2,7 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block title %}Linty - Privacy{% endblock %}
+{% block title %}Eyrie - Privacy{% endblock %}
 
 {% block body %}
     <div class="ui text menu">
@@ -14,21 +14,24 @@
         {% include 'interface/user_dropdown.html' with private=True %}
     </div>
     <div class="ui container">
-        <h1 class="ui header center aligned">How Linty Uses Your Data</h1>
+        <h1 class="ui header center aligned">How Eyrie Uses Your Data</h1>
         <p class="description">
-            When a user first signs into Linty, GitHub asks if they wish to give Linty permission to access details of their account.
-            Linty only requests the data necessary to operate, namely, the list of repositories the user has access to and their username.
-            When a commit is pushed to a repository watched by Linty, a copy of that commit is created inside Linty.
-            A series of linters are then run against the code, and output is generated for reporting the linting status.
-            Once linting is complete, the code is destroyed.
+            When a user first signs into Eyrie, GitHub asks if they wish to give Eyrie permission to access details of their account.
+            Eyrie only requests the data necessary to operate, namely, the list of repositories the user has access to and their username.
+            When a commit is pushed to a repository watched by Eyrie, any text documents (such as .txt or .md) are copied into Eyrie's database for browsing.
+            Eyrie keeps no copies of code files.
         </p>
         <p class="description">
-            Users can disconnect their GitHub account from Linty at any time by visiting <a href="{% url 'social:disconnect' 'github' %}">this URL</a>.
-            However, because Linty depends on GitHub to function, disconnected users will need to sign in again if they wish to view past results for private repositories.
+            Users who wish to remove a repository from Eyrie may go to the repositority's settings screens in Eyrie and click "delete".
+            This will delete all copied documents from Eyrie's database.
         </p>
         <p class="description">
-            Linty code is <a href="https://github.com/ZeroCater/linty">open source</a>, so you can review it for yourself.
-            Linty is hosted on <a href="https://www.heroku.com/home">Heroku</a>.
+            Users can disconnect their GitHub account from Eyrie at any time by visiting <a href="{% url 'social:disconnect' 'github' %}">this URL</a>.
+            However, because Eyrie depends on GitHub to function, disconnected users will need to sign in again if they wish any private repositories in Eyrie.
+        </p>
+        <p class="description">
+            Eyrie's code is <a href="https://github.com/ZeroCater/Eyrie">open source</a>, so you can review it for yourself.
+            Eyrie is hosted on <a href="https://www.heroku.com/home">Heroku</a>.
         </p>
     </div>
 {% endblock %}
