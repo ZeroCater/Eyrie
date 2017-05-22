@@ -2,7 +2,7 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block title %}Linty - Error{% endblock %}
+{% block title %}Eyrie - Error{% endblock %}
 
 {% block body %}
     <div class="ui text menu">
@@ -19,7 +19,7 @@
             An error occurred while processing your request.
         </p>
         <p class="description">
-            Please submit a bug report at <a href="https://github.com/ZeroCater/linty/issues">the code repository</a>.
+            Please submit a bug report at <a href="https://github.com/ZeroCater/eyrie/issues">the code repository</a>.
         </p>
         {% if user.is_authenticated %}
             <a href="{% url 'repo_list' %}" class="ui big primary button">Go to Dashboard</a>
