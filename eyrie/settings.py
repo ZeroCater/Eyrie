@@ -171,6 +171,7 @@ if not DEBUG:  # pragma: no cover
     X_FRAME_OPTIONS = 'DENY'
     SECURE_HSTS_SECONDS = 31536000
     SESSION_COOKIE_DOMAIN = os.environ.get('COOKIE_DOMAIN', HOSTNAME)
+    PREPEND_WWW = True
 
     LOGGING = {
         'version': 1,
