@@ -158,8 +158,6 @@ if not DEBUG:  # pragma: no cover
         'raven.contrib.django.raven_compat'
     ]
 
-    ALLOWED_HOSTS = ['www.eyrieapp.com', 'eyrieapp.com']
-
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
