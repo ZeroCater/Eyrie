@@ -1,4 +1,4 @@
-import markdown
+import markdown as markdown_lib
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -24,7 +24,7 @@ def humanize_td(delta):
 
 @register.filter
 def markdown(text):
-    rendered = markdown.markdown(text)
+    rendered = markdown_lib.markdown(text)
 
     # Remove <code> blocks nested in <pre>
     rendered = rendered.replace('<pre><span></span><code>', '<pre>').replace('<pre><code>', '<pre>')
