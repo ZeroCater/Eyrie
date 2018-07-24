@@ -8,6 +8,6 @@ whitenoise==3.2.1
 pygithub==1.26.0
 django-rq==0.9.5
 raven==6.0.0
-markdown2==2.3.3
+markdown2==2.4
 pathlib==1.0.1
 python-dateutil==2.6.0
