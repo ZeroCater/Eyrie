@@ -1,13 +1,13 @@
 dj-database-url==0.4.1
 Django==1.10
 requests==2.12.4
-psycopg2==2.6.2
+psycopg2==2.7.3
 python-social-auth==0.2.21
 gunicorn==19.6.0
 whitenoise==3.2.1
 pygithub==1.26.0
 django-rq==0.9.5
 raven==6.0.0
-markdown2==2.3.3
+markdown==2.6.11
 pathlib==1.0.1
 python-dateutil==2.6.0
