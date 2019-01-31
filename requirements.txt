@@ -5,7 +5,7 @@ psycopg2==2.7.7
 python-social-auth==0.2.21
 gunicorn==19.6.0
 whitenoise==3.2.1
-pygithub==1.26.0
+pygithub==1.43.5
 django-rq==0.9.5
 raven==6.0.0
 markdown==2.6.11
