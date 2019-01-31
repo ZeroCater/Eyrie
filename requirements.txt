@@ -1,7 +1,7 @@
 dj-database-url==0.4.1
 Django==1.10
 requests==2.20.0
-psycopg2==2.7.3
+psycopg2==2.7.7
 python-social-auth==0.2.21
 gunicorn==19.6.0
 whitenoise==3.2.1
